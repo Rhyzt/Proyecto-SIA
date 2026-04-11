@@ -22,5 +22,12 @@ public class Persona {
     public void setRut(String rut) { this.rut = rut; }
     public void setEdad(int edad) { this.edad = edad; }
     public void setSexo(String sexo) { this.sexo = sexo; }
-     
+    
+    //Metodos
+    public void obtenerResumen() {
+        System.out.println("Nombre: " + nombre);
+        System.out.println("Rut: " + rut);
+        System.out.println("edad: " + edad);
+        System.out.println("Sexo: " + sexo);
+    }
 }

@@ -1,14 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/**
- *
- * @author andre
- */
-public class CampañaEnfocada extends Campaña{
+public class CampañaEnfocada extends Campaña {
     private String grupoObjetivo;
     private float bonoPrioridad;
     
@@ -25,4 +15,6 @@ public class CampañaEnfocada extends Campaña{
     //Setters
     public void setGrupoObjetivo(String grupoObjetivo) { this.grupoObjetivo = grupoObjetivo; }
     public void setBonoPrioridad(float bonoPrioridad) { this.bonoPrioridad = bonoPrioridad; }
+    
+    
 }

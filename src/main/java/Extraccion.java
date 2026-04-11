@@ -1,10 +1,10 @@
 public class Extraccion {
     private Donante voluntario;
     private String fechaExtraccion;
-    private int volumenExtraido;
+    private float volumenExtraido;
     private boolean seSintioMal;
    
-    public Extraccion (Donante voluntario, String fechaExtraccion, int volumenExtraido, boolean seSintioMal) {
+    public Extraccion (Donante voluntario, String fechaExtraccion, float volumenExtraido, boolean seSintioMal) {
         this.voluntario = voluntario;
         this.fechaExtraccion = fechaExtraccion;
         this.volumenExtraido = volumenExtraido;
@@ -14,7 +14,7 @@ public class Extraccion {
     //Getters
     public Donante getVoluntario() { return voluntario; }
     public String getFechaExtraccion() { return fechaExtraccion; }
-    public int getVolumenExtraido() { return volumenExtraido; }
+    public float getVolumenExtraido() { return volumenExtraido; }
     public boolean getSeSintioMal() { return seSintioMal; }
     
     //Setters
