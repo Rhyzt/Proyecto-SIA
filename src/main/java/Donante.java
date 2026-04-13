@@ -37,9 +37,13 @@ public class Donante extends Persona {
         System.out.println("Numero Telefonico: " + telefono);        
     }
     
-    public boolean esAptoParaDonar(LocalDate fechaCampaña) { // Comprobar que no haya donado en los ultimos 4 meses
-        Period periodo = Period.between(fechaCampaña, fechaUltimaDonacion);
-        return (!(periodo.getYears() == 0 && periodo.getMonths() < 4));
+    public boolean esAptoParaDonar(LocalDate fechaCampaña) throws FrecuenciaDonacionException { // Comprobar que no haya donado en los ultimos 4 meses
+        if (fechaUltimaDonacion == null) return true;
+        
+        if (fechaUltimaDonacion.isAfter(fechaCampaña.minusMonths(4))) {
+            throw new FrecuenciaDonacionException("No han pasado 4 meses desde la última donación.");
+        }
+        return true;
     }
     
     

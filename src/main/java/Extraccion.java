@@ -1,10 +1,12 @@
+import java.time.LocalDate;
+
 public class Extraccion {
     private Donante voluntario;
-    private String fechaExtraccion;
+    private LocalDate fechaExtraccion;
     private float volumenExtraido;
     private boolean seSintioMal;
    
-    public Extraccion (Donante voluntario, String fechaExtraccion, float volumenExtraido, boolean seSintioMal) {
+    public Extraccion (Donante voluntario, LocalDate fechaExtraccion, float volumenExtraido, boolean seSintioMal) {
         this.voluntario = voluntario;
         this.fechaExtraccion = fechaExtraccion;
         this.volumenExtraido = volumenExtraido;
@@ -13,13 +15,13 @@ public class Extraccion {
     
     //Getters
     public Donante getVoluntario() { return voluntario; }
-    public String getFechaExtraccion() { return fechaExtraccion; }
+    public LocalDate getFechaExtraccion() { return fechaExtraccion; }
     public float getVolumenExtraido() { return volumenExtraido; }
     public boolean getSeSintioMal() { return seSintioMal; }
     
     //Setters
     public void setVoluntario(Donante voluntario) { this.voluntario = voluntario; }
-    public void setFechaExtraccion(String fechaExtraccion) { this.fechaExtraccion = fechaExtraccion; }
+    public void setFechaExtraccion(LocalDate fechaExtraccion) { this.fechaExtraccion = fechaExtraccion; }
     public void setVolumenExtraido(int volumenExtraido) { this.volumenExtraido = volumenExtraido; }
     public void setSeSintioMal(boolean seSintioMal) { this.seSintioMal = seSintioMal; }
 }

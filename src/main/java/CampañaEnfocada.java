@@ -2,8 +2,8 @@ public class CampañaEnfocada extends Campaña {
     private String grupoObjetivo;
     private float bonoPrioridad;
     
-    public CampañaEnfocada(int idCampaña, String nombreCampaña, String ubicacion, String fechaCampaña, int metaDonaciones, String grupoObjetivo, float bonoPrioridad) {
-        super(idCampaña, nombreCampaña, ubicacion, fechaCampaña, metaDonaciones);
+    public CampañaEnfocada(String nombreCampaña, String ubicacion, String fechaCampaña, int metaDonaciones, String grupoObjetivo, float bonoPrioridad) {
+        super(nombreCampaña, ubicacion, fechaCampaña, metaDonaciones);
         this.grupoObjetivo = grupoObjetivo;
         this.bonoPrioridad = bonoPrioridad;
     }
