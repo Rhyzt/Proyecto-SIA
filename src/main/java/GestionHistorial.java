@@ -85,13 +85,15 @@ public class GestionHistorial {
     public boolean registrarExtraccion(String idCampaña, Extraccion e) {
         // Se asocia la extraccion con la campaña en el mapa
         if (!historial.containsKey(idCampaña)) return false;
-            historial.get(idCampaña).add(e); // Busca la Campaña en el mapa y añade la Extraccion a la ArrayList
-            inv.registrarIngreso(e);
+        
+        historial.get(idCampaña).add(e); // Busca la Campaña en el mapa y añade la Extraccion a la ArrayList
+        inv.registrarIngreso(e);
         
         // Actualizar al donante
         e.getVoluntario().setFechaUltimaDonacion(e.getFechaExtraccion());
         agregarDonante(e.getVoluntario());
-        }
+        return true;
+    }
 
     public List<Extraccion> obtenerExtracciones(String idCampaña) {
         return historial.getOrDefault(idCampaña, new ArrayList<>());
