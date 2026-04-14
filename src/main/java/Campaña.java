@@ -8,7 +8,8 @@ public class Campaña {
     private String nombreCampaña;
     private String ubicacion;
     private LocalDate fechaCampaña;
-    private int metaDonaciones;
+    private int metaDonaciones; // Se usaran en ml
+    
     private static final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     
     public Campaña(String nombreCampaña, String ubicacion, String fechaCampaña, int metaDonaciones) {

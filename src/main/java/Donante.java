@@ -22,9 +22,7 @@ public class Donante extends Persona {
     
     //Setters
     public void setTipoSangre(String tipoSangre) { this.tipoSangre = tipoSangre; }
-    public void setFechaUltimaDonacion(String fechaUltimaDonacion) {
-        this.fechaUltimaDonacion = LocalDate.parse(fechaUltimaDonacion, formatoFecha);
-    }
+    public void setFechaUltimaDonacion(LocalDate fechaUltimaDonacion) { this.fechaUltimaDonacion = fechaUltimaDonacion; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
     
     //Metodos
