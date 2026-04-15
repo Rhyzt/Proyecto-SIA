@@ -27,6 +27,8 @@ public class Donante extends Persona {
     
     //Metodos
     @Override
+    /** Obtiene informacion del donante
+     * */
     public void obtenerResumen() {
         super.obtenerResumen();
         System.out.println("Tipo de Sangre: " + tipoSangre);
@@ -34,8 +36,13 @@ public class Donante extends Persona {
         System.out.println("Fecha ultima donacion: " + fechaFormateada);
         System.out.println("Numero Telefonico: " + telefono);        
     }
-    
-    public boolean esAptoParaDonar(LocalDate fechaCampaña) throws FrecuenciaDonacionException { // Comprobar que no haya donado en los ultimos 4 meses
+    /**
+     * Revisa si el donante es apto para donar y si no arroja FrecuenciaDonacionException
+     * @param fechaCampaña
+     * @return Un booleano que indica si el donante es apto para donar (mas de 4 meses desde la ultima donacion y edad entre 18 a 65)
+     * @throws FrecuenciaDonacionExceptieon 
+     */
+    public boolean esAptoParaDonar(LocalDate fechaCampaña) throws FrecuenciaDonacionException { 
         if (fechaUltimaDonacion == null) return true;
         
         if (fechaUltimaDonacion.isAfter(fechaCampaña.minusMonths(4))) {

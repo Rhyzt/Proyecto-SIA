@@ -1,4 +1,3 @@
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -16,7 +15,8 @@ public class GestionHistorial {
     private List<Campaña> campañas;
     private Map<String, Donante> voluntarios;
     private Inventario inv;
-
+    
+    //Constante usada para formatear 
     private static final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public GestionHistorial() {
@@ -26,9 +26,18 @@ public class GestionHistorial {
         inv = new Inventario();
     }
 
-    //Metodos
-    /** Agrega una campaña a la lista y al mapa, luego retorna true.
-     si encontro una campaña con el mismo id retorna false*/
+    
+    
+    
+    
+    
+    
+    //Metodos Campaña
+    /**
+     * Agrega una campaña a la lista y al mapa.
+     * @param c
+     * @return Un booleano que es true si se pudo agregar esta campaña y false si no (ya existia en el sistema)
+     */
     public boolean agregarCampaña(Campaña c) {
         if (historial.containsKey(c.getIdCampaña())) { // Se revisa si existia la campaña
             return false;
@@ -39,7 +48,9 @@ public class GestionHistorial {
         return true;
     }
 
-    /** Entrega informacion de todas las campañas presentes en la lista */
+    /**
+     * Entrega informacion de todas las campañas presentes en la lista
+     */
     public void listarCampañas() {
         System.out.println("LISTADO DE CAMPAÑAS EN EL SISTEMA");
         for (Campaña c : campañas) {
@@ -51,21 +62,29 @@ public class GestionHistorial {
         }
     }
 
-    /** Busca campañas por el id */
-    public Campaña buscarCampaña(String id) {
+    /**
+     * Busca campañas por el id de esta
+     * @param idCampaña
+     * @return Un Objeto Campaña correspondiente al id entregado
+     */
+    public Campaña buscarCampaña(String idCampaña) {
         for (Campaña c : campañas) {
-            if (c.getIdCampaña().equals(id)) {
+            if (c.getIdCampaña().equals(idCampaña)) {
                 return (Campaña) c;
             }
         }
         return null;
     }
 
-    /** Elimina una campaña del sistema, junto a las extracciones relacionadas a esta y refleja 
-    los cambios en el inventario retornando true, si no pudo encontrar el tipo de Sangre retorna false. */
-    public boolean eliminarCampaña(String id) {
+    /**
+     * Elimina una campaña del sistema, junto a las extracciones  
+     * relacionadas a esta y refleja los cambios en el inventario.
+     * @param idCampaña
+     * @return Un booleano que da true si se borro la campaña o false si no (no se encontro la campaña especificada)
+     */
+    public boolean eliminarCampaña(String idCampaña) {
         // Se obtiene la lista de extracciones asociadas a la campaña a borrar a la vez que se elimina del mapa
-        List<Extraccion> extraccionesABorrar = historial.remove(id); 
+        List<Extraccion> extraccionesABorrar = historial.remove(idCampaña); 
         
         if (extraccionesABorrar != null) {
             // Se obtiene cada extraccion y se va restando el tipo de sangre que corresponda
@@ -76,12 +95,23 @@ public class GestionHistorial {
                 inv.restarStock(tipo, volumen);
             }
         }
-        return campañas.removeIf(c -> c.getIdCampaña().equals(id)); // Borra la campaña de la lista retorna true si existia y false si no
+        return campañas.removeIf(c -> c.getIdCampaña().equals(idCampaña)); // Borra la campaña de la lista retorna true si existia y false si no
     }
     
-    /** Se registra una extraccion, asociandola con la campaña
-     y añadiendo lo que corresponda al inventario.
-     Ademas actualiza la fecha de ultimo donacion del voluntario*/
+    
+    
+    
+    
+    
+    //Metodos Extraccion
+    /**
+     * Se registra una extraccion, asociandola con la campaña
+     * y añadiendo lo que corresponda al inventario.
+     *  Ademas, actualiza la fecha de ultimo donacion del voluntario
+     * @param idCampaña
+     * @param e
+     * @return Un booleano que indica si la extraccion fue agregada o no (no existia la campaña)
+     */
     public boolean registrarExtraccion(String idCampaña, Extraccion e) {
         // Se asocia la extraccion con la campaña en el mapa
         if (!historial.containsKey(idCampaña)) return false;
@@ -94,22 +124,159 @@ public class GestionHistorial {
         agregarDonante(e.getVoluntario());
         return true;
     }
+    
+    /**
+     * Printea un listado de las extracciones asociadas con cierta campaña
+     * @param idCampaña 
+     */
+    public void listarExtracciones(String idCampaña) {
+        List<Extraccion> lista = historial.get(idCampaña);
 
-    public List<Extraccion> obtenerExtracciones(String idCampaña) {
-        return historial.getOrDefault(idCampaña, new ArrayList<>());
+        if (lista == null || lista.isEmpty()) { // Si la campaña no tiene ninguna extraccion registrada o no existe
+            System.out.println("No hay extracciones registradas para esta campaña.");
+            return;
+        }
+
+        System.out.println("EXTRACCIONES DE LA CAMPAÑA: " + idCampaña);
+        for (Extraccion e : lista) { // Itera por caada una de las extracciones de una campaña y las muestra
+            System.out.println("Donante: " + e.getVoluntario().getNombre() +
+                               " | RUT: " + e.getVoluntario().getRut() +
+                               " | Volumen: " + e.getVolumenExtraido() + "ml" +
+                               " | ¿Se sintió mal?: " + (e.getSeSintioMal() ? "Sí" : "No"));
+        }
     }
     
+    /**
+     * Busca en el mapa todas las extracciones que pertenezcan al rut dado.
+     * @param rut
+     * @return Una lista con la informacion de las extracciones y su campaña respectiva.
+     */
+    public List<InfoDonacion> buscarExtraccion(String rut) {
+        List<InfoDonacion> coincidencias = new ArrayList<>();
+        
+        /* Se recorren todas las campañas para obtener su informacion respectiva,
+        buscando las que el rut del donante coincidan con el valor ingresado */
+        for (Campaña c : campañas) {
+            // Obtenemos la lista de extracciones de cada campaña especifica
+            List<Extraccion> listaCampaña = historial.get(c.getIdCampaña()); 
+
+            if (listaCampaña != null) {
+                for (Extraccion e : listaCampaña) {
+                    //Si se encuentra una extraccion coincidente, se crea un objeto InfoDonacion
+                    if (e.getVoluntario().getRut().equalsIgnoreCase(rut)) {
+                        coincidencias.add(new InfoDonacion(
+                            c.getNombreCampaña(),
+                            c.getFechaCampaña(),
+                            e.getVolumenExtraido(),
+                            e.getSeSintioMal()
+                        ));
+                    }
+                }
+            }
+        }
+        return coincidencias;
+    }
+    
+    /**
+     * Busca en el mapa todas las extracciones que pertenezcan al rut dado de la campaña especificada.
+     * @param rut
+     * @param idCampaña
+     * @return 
+     */
+    public Extraccion buscarExtraccion(String rut, String idCampaña) {
+        if(!historial.containsKey(idCampaña)) return null;
+        
+        for (Extraccion e : historial.get(idCampaña)) {
+            if (e.getVoluntario().getRut().equalsIgnoreCase(rut)) {
+                return e;
+            }
+        }
+       return null;
+    }
+    
+    /**
+     * Borra una extraccion usando el rut y la id de la campaña, retorna
+     * @param idCampaña
+     * @param rut
+     * @return 
+     */
+    public boolean borrarExtraccion(String idCampaña, String rut) {
+        if (!historial.containsKey(idCampaña)) return false;
+        
+        List<Extraccion> lista = historial.get(idCampaña);
+        return lista.removeIf(e -> { // Se itera por cada extraccion de la campaña
+            if (e.getVoluntario().getRut().equalsIgnoreCase(rut)) { // Si existe una extraccion con el rut indicado
+                inv.restarStock(e.getVoluntario().getTipoSangre(), e.getVolumenExtraido()); // Se actualiza el inventario
+                return true;
+            }
+            return false;
+        });
+    }
+    
+    /**
+     * Obtiene las extracciones de una campaña especifica
+     * @param idCampaña
+     * @return Una Lista de Extracciones correspondientes a la campaña indicada, si no existia esta campaña, retorna null
+     */
+    public List<Extraccion> obtenerExtracciones(String idCampaña) {
+        return historial.get(idCampaña);
+    }
+    
+    
+    
+    
+    
+    
+    
+    //Metodos Donante
+    /**
+     * Agrega un donante al mapa de voluntarios
+     * @param d
+     * @return Un booleano que es true si se pudo agregar al donante y false si no (ya se encontraba en el mapa)
+     */
     public boolean agregarDonante(Donante d) {
         if (voluntarios.containsKey(d.getRut()))
             return false;
-        voluntarios.put(d.getRut(), d);
+        voluntarios.put(d.getRut(), d); 
         return true;
     }
     
+    /**
+     * Busca un donante en el mapa
+     * @param rut
+     * @return Un objeto Donante con la informacion de este, si no se encontro el rut especificado retorna null
+     */
     public Donante buscarDonante(String rut) {
         return voluntarios.get(rut); //retorna null si no existe el donante
     }
-
+    
+    /**
+     * Elimina un donante del mapa de voluntarios y todas sus extracciones asociadas en las campañas
+     * @param rut
+     * @return Un booleano, que indica true si se borro al donante y sus extracciones, y false si no se encontro el Donante
+     */
+    public boolean eliminarDonante(String rut) {
+        Donante d = voluntarios.get(rut);
+        if (d == null) return false;
+        
+        for (List<Extraccion> listaCampaña : historial.values()) {
+            listaCampaña.removeIf(e -> {
+                if (e.getVoluntario().getRut().equalsIgnoreCase(rut)) {
+                    inv.restarStock(d.getTipoSangre(), e.getVolumenExtraido());
+                    return true;
+                }
+                return false;
+            });
+        }
+        voluntarios.remove(rut);
+        return true;
+    }
+    
+    /**
+     * Filtra el mapa de donantes por el tipo de sangre especificado.
+     * @param tipoSangre
+     * @return Una Lista de Donantes que poseen el tipo de sangre y ademas no arrojan FrecuenciaDonacionException (son aptos para donar)
+     */
     public List<Donante> filtroTipoAntiguedad(String tipoSangre) {
         List<Donante> aptos = new ArrayList<>();
         
@@ -123,7 +290,6 @@ public class GestionHistorial {
                 }
             }
         }
-        
         return aptos;
     }
     

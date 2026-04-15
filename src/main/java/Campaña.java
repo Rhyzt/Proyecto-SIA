@@ -31,8 +31,6 @@ public class Campaña {
     public void setIdCampaña(String idCampaña){ this.idCampaña = idCampaña; }
     public void setNombreCampaña(String nombreCampaña){ this.nombreCampaña = nombreCampaña; }
     public void setUbicacion(String ubicacion){ this.ubicacion = ubicacion; }
-    public void setFechaCampaña(String fechaCampaña){
-        this.fechaCampaña = LocalDate.parse(fechaCampaña, formatoFecha);
-    }
+    public void setFechaCampaña(LocalDate fechaCampaña){ this.fechaCampaña = fechaCampaña; }
     public void setMetaDonaciones(int metaDonaciones){ this.metaDonaciones = metaDonaciones; }
 }
