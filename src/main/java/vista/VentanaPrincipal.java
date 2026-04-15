@@ -8,6 +8,7 @@ import exceptions.FrecuenciaDonacionException;
 import javax.swing.*;
 import java.awt.*;
 import java.util.Map;
+import procesamiento.Validadores;
 import procesamiento.GestionHistorial;
 
 public class VentanaPrincipal extends JFrame {
@@ -39,13 +40,57 @@ public class VentanaPrincipal extends JFrame {
             try {
                 String nombre = JOptionPane.showInputDialog(this, "Nombre Completo:");
                 if (nombre == null) return;
+                // VALIDAR NOMBRE
+                if (!Validadores.esNombreValido(nombre)) {
+                    JOptionPane.showMessageDialog(this, 
+                        "❌ " + Validadores.obtenerMensajeErrorNombre(), 
+                        "Error de Nombre", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 String rut = JOptionPane.showInputDialog(this, "RUT (sin puntos ni guion):");
+                if (rut == null) return;
+                // VALIDAR RUT
+                if (!Validadores.esRutValido(rut)) {
+                    JOptionPane.showMessageDialog(this, 
+                        "❌ " + Validadores.obtenerMensajeErrorRUT(rut), 
+                        "Error de RUT", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
                 int edad = Integer.parseInt(JOptionPane.showInputDialog(this, "Edad:"));
 
                 if (edad < 18 || edad > 65) throw new EdadNoValidaException(edad);
 
-                String tipo = JOptionPane.showInputDialog(this, "Tipo de Sangre (ej: O+):").toUpperCase();
-                String tel = JOptionPane.showInputDialog(this, "Teléfono de contacto:");
+                String[] sexosDisponibles = Validadores.obtenerSexosDisponibles();
+                String sexo = (String) JOptionPane.showInputDialog(this,
+                    "Selecciona sexo:",
+                    "Sexo",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    sexosDisponibles,
+                    sexosDisponibles[0]);
+
+                if (sexo == null) return;
+                
+                // Mostrar dropdown con tipos de sangre válidos
+                String[] tiposDisponibles = Validadores.obtenerTiposSangreValidos();
+                String tipo = (String) JOptionPane.showInputDialog(this,
+                    "Selecciona tipo de sangre:",
+                    "Tipo de Sangre",
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    tiposDisponibles,
+                    tiposDisponibles[0]);
+                
+                if (tipo == null) return;
+                
+                String tel = JOptionPane.showInputDialog(this, "Teléfono de contacto: (ej: 912345678)");
+                // ✅ VALIDAR TELÉFONO
+                if (!Validadores.esTelefonoValido(tel)) {
+                    JOptionPane.showMessageDialog(this, 
+                        "❌ " + Validadores.obtenerMensajeErrorTelefono(tel), 
+                        "Error de Teléfono", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }
 
                 Donante nuevo = new Donante(nombre, rut, edad, "M", tipo, "01/01/2000", tel);
                 if (sistema.agregarDonante(nuevo)) {
