@@ -172,7 +172,7 @@ public class VentanaPrincipal extends JFrame {
 
         // 6. Inventario (SIA-4)
         btnInventario.addActionListener(e -> {
-            JOptionPane.showMessageDialog(this, sistema.getInv().obtenerInventarioString(), "Inventario Actual", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, obtenerInventarioString(), "Inventario Actual", JOptionPane.INFORMATION_MESSAGE);
         });
 
         // 7. Eliminar Campaña (SIA-8) -> Refleja cambios en el stock
@@ -203,5 +203,17 @@ public class VentanaPrincipal extends JFrame {
         JScrollPane scroll = new JScrollPane(area);
         scroll.setPreferredSize(new Dimension(400, 300));
         JOptionPane.showMessageDialog(this, scroll, titulo, JOptionPane.PLAIN_MESSAGE);
+    }
+    
+    public String obtenerInventarioString() {
+        Map<String,Integer> stockActual = sistema.getInv().getStockSangre();
+        if (stockActual.isEmpty()) return "El inventario está vacío.";
+
+        StringBuilder sb = new StringBuilder("--- STOCK DE SANGRE ---\n");
+        for (Map.Entry<String, Integer> entrada : stockActual.entrySet()) {
+            sb.append("Tipo: ").append(entrada.getKey())
+                    .append(" | Volumen: ").append(entrada.getValue()).append(" ml\n");
+        }
+        return sb.toString();
     }
 }

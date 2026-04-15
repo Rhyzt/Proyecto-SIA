@@ -182,8 +182,7 @@ public class GestionHistorial {
                     //Si se encuentra una extraccion coincidente, se crea un objeto InfoDonacion
                     if (e.getVoluntario().getRut().equalsIgnoreCase(rut)) {
                         coincidencias.add(new InfoDonacion(
-                            c.getNombreCampaña(),
-                            c.getFechaCampaña(),
+                            c.getIdCampaña(),
                             e.getVolumenExtraido(),
                             e.getSeSintioMal()
                         ));
@@ -193,12 +192,11 @@ public class GestionHistorial {
         }
         return coincidencias;
     }
-    
     /**
      * Busca en el mapa todas las extracciones que pertenezcan al rut dado de la campaña especificada.
      * @param rut
      * @param idCampaña
-     * @return 
+     * @return Un objeto Extraccion con la informacion de la extraccion o null si no se encontro
      */
     public Extraccion buscarExtraccion(String rut, String idCampaña) {
         if(!historial.containsKey(idCampaña)) return null;
@@ -235,7 +233,7 @@ public class GestionHistorial {
      * @param idCampaña
      * @return Una Lista de Extracciones correspondientes a la campaña indicada, si no existia esta campaña, retorna null
      */
-    public List<Extraccion> obtenerExtracciones(String idCampaña) {
+    public List<Extraccion> listaExtracciones(String idCampaña) {
         return historial.get(idCampaña);
     }
     
@@ -335,6 +333,105 @@ public class GestionHistorial {
             return true;
         } catch (IOException ex) {
             System.out.println("Error al exportar el archivo: " + ex.getMessage());
+            return false;
+        }
+    }
+    
+    
+    
+    
+    
+    //Edicion
+    /**
+     * Actualiza un donante que se encuentra con el rut a los datos que se le pasen (pueden ser los mismos de antes)
+     * @param rut String para buscar al donante objetivo
+     * @return Un booleano que indica si se encontro al donante y pudo actualizar sus datos
+     */
+    public boolean actualizarDonante(String rut, String nombreNuevo, int edadNuevo, String sexoNuevo, String tipoSangreNuevo, String numeroNuevo) {
+        Donante d = buscarDonante(rut);
+        if (d != null) {
+            d.setNombre(nombreNuevo);
+            d.setEdad(edadNuevo);
+            d.setSexo(sexoNuevo);
+            d.setTelefono(numeroNuevo);
+            if (!tipoSangreNuevo.equalsIgnoreCase(d.getTipoSangre())) {
+                /*Se deberia restar el stock de todas las extracciones que existan
+                que esten asociadas al donante, y luego volver a sumarlas todas al inventario
+                */
+                actualizarTipoSangre(rut, tipoSangreNuevo);
+                d.setTipoSangre(tipoSangreNuevo);
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    public void actualizarTipoSangre(String rut, String tipoSangreNuevo) {
+        List<InfoDonacion> listaE = buscarExtraccion(rut);
+        int volumenTotal = 0;
+        for (InfoDonacion inf : listaE) {
+            volumenTotal += inf.getVolumen();
+        }
+        inv.restarStock(buscarDonante(rut).getTipoSangre(), volumenTotal); //Restado del inventario antiguo
+        //Se añade al stock correspondiente
+        inv.registrarIngreso(tipoSangreNuevo, volumenTotal);
+    }
+    
+    /**
+     * Actualiza una campaña a los datos nuevos que se le pasen
+     * @param idOriginal id original de la campaña a editar (si es que se le edita el nombre o fecha)
+     * @param nombreCampaña String al que se cambiara el nombreCampaña
+     * @param ubicacion String al que se cambiara la ubicacion
+     * @param fechaCampaña String de la fecha en formato "DD/MM/AAAA" a cambiar
+     * @param metaDonaciones Int de la metaDonaciones a cambiar
+     * @return Un boolean que indica si se encontraba la campaña buscada
+     * y se pudo cambiar su informacion exitosamente.
+     */
+    public boolean actualizarCampaña(String idOriginal, String nombreCampaña, String ubicacion, String fechaCampaña, int metaDonaciones) {
+        Campaña c = buscarCampaña(idOriginal);
+        if (c == null) return false;
+        
+        try {
+            c.setUbicacion(ubicacion);
+            c.setMetaDonaciones(metaDonaciones);
+
+            String idNuevo = nombreCampaña.trim() + "_" + fechaCampaña;
+            if (!idNuevo.equals(idOriginal)) {
+                c.setIdCampaña(idNuevo);
+                c.setNombreCampaña(nombreCampaña);
+                LocalDate fechaFormateada = LocalDate.parse(fechaCampaña, formatoFecha);
+                c.setFechaCampaña(fechaFormateada);
+                List<Extraccion> respaldo = historial.remove(idOriginal);
+                historial.put(idNuevo, respaldo);
+            }
+            return true;
+        } catch (java.time.format.DateTimeParseException e) {
+            // Error al parsear la fecha
+            return false;
+        }
+    }
+    
+    
+    public boolean actualizarExtraccion(String rutDonanteOriginal, String idCampaña,
+            String rutDonanteNuevo, String fechaNueva,
+            int volumenNuevo, boolean seSintioMalNuevo) {
+        Extraccion e = buscarExtraccion(rutDonanteOriginal, idCampaña);
+        Donante dNuevo = buscarDonante(rutDonanteNuevo);
+        if (e == null  || dNuevo == null) return false;
+        
+        
+        try {
+            LocalDate fechaFormateada = LocalDate.parse(fechaNueva, formatoFecha);
+            inv.restarStock(e);
+            
+            e.setFechaExtraccion(fechaFormateada);
+            e.setSeSintioMal(seSintioMalNuevo);
+            e.setVolumenExtraido(volumenNuevo);
+            e.setVoluntario(dNuevo);
+            inv.registrarIngreso(e);
+            return true;
+        } catch (java.time.format.DateTimeParseException ex) {
+            // Error al parsear la fecha
             return false;
         }
     }
