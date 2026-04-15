@@ -2,70 +2,84 @@ import java.util.Map;
 import java.util.TreeMap;
 
 public class Inventario {
-    private Map<String, Integer> stockSangre; 
-    
+    private Map<String, Integer> stockSangre;
+
     public Inventario() {
-        // Para que los tipos esten ordenados alfabeticamente, se usaran en mayuscula (ej. AB+)
-         stockSangre = new TreeMap<>(); 
+        // TreeMap asegura que los tipos (A+, O-, etc.) aparezcan ordenados alfabéticamente (SIA-4)
+        stockSangre = new TreeMap<>();
     }
-    
+
     /**
-     * Actualiza el inventario segun la donacion entregada
-     * @param donacion 
+     * Registra el ingreso de sangre al stock tras una extracción.
      */
     public void registrarIngreso(Extraccion donacion) {
         int volumen = donacion.getVolumenExtraido();
-        String tipoSangre = donacion.getVoluntario().getTipoSangre();
-        
+        String tipoSangre = donacion.getVoluntario().getTipoSangre().toUpperCase();
+
         int actual = stockSangre.getOrDefault(tipoSangre, 0);
         stockSangre.put(tipoSangre, actual + volumen);
     }
-    
+
     /**
-     * Printea el inventario, mostrando todos los tipos existentes en el inventario y el volumen que hay disponible.
+     * SOBRECARGA 1 (SIA-5): Printea el inventario completo.
      */
     public void mostrarInventario() {
+        System.out.println("\n--- ESTADO GENERAL DEL INVENTARIO ---");
         if (!stockSangre.isEmpty()) {
             for (Map.Entry<String, Integer> entrada : stockSangre.entrySet()) {
                 System.out.println("Tipo: " + entrada.getKey() + " | Volumen: " + entrada.getValue() + " ml");
             }
-            return;
+        } else {
+            System.out.println("El inventario está vacío.");
         }
-        System.out.println("El inventario está vacío.");
     }
-    
+
     /**
-     * Printea la informacion del tipo deseado de sangre, si no existe, avisa que este tipo de sangre no existe en el inventario
-     * @param tipoDeseado 
+     * SOBRECARGA 2 (SIA-5): Seguimiento de disponibilidad crítica.
+     * Busca y muestra solo los tipos de sangre que están bajo el límite especificado.
+     * @param limiteCritico Volumen mínimo de seguridad en ml.
      */
-    public void mostrarInventario(String tipoDeseado) {
-        String tipoForm = tipoDeseado.toUpperCase().trim();
-        if (stockSangre.containsKey(tipoForm))
-            System.out.println("Tipo " + tipoForm + " tiene " + stockSangre.get(tipoForm) + "ml disponibles.");
-        else
-            System.out.println("Error: El tipo de sangre '" + tipoForm + "' no se encuentra en el inventario.");
+    public void mostrarInventario(int limiteCritico) {
+        System.out.println("\n--- ALERTAS DE RESERVAS CRÍTICAS (Bajo " + limiteCritico + "ml) ---");
+        boolean hayAlertas = false;
+
+        for (Map.Entry<String, Integer> entrada : stockSangre.entrySet()) {
+            if (entrada.getValue() < limiteCritico) {
+                System.out.println("¡ALERTA! Tipo " + entrada.getKey() + " requiere reposición inmediata. Stock: " + entrada.getValue() + "ml");
+                hayAlertas = true;
+            }
+        }
+
+        if (!hayAlertas) {
+            System.out.println("No se detectaron reservas bajo el nivel crítico de seguridad.");
+        }
     }
-    
+
     /**
-     * Resta el volumen especificado de un tipo de sangre.
-     * @param tipoDeseado
-     * @param volumen
-     * @return Un booleano que da true si se redujo la sangre y false si no (no existia el tipo de sangre en el inventario)
+     * Genera un reporte formateado para ser visualizado en Ventanas (Swing).
+     */
+    public String obtenerInventarioString() {
+        if (stockSangre.isEmpty()) return "El inventario está vacío.";
+
+        StringBuilder sb = new StringBuilder("--- STOCK DE SANGRE ---\n");
+        for (Map.Entry<String, Integer> entrada : stockSangre.entrySet()) {
+            sb.append("Tipo: ").append(entrada.getKey())
+                    .append(" | Volumen: ").append(entrada.getValue()).append(" ml\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Resta volumen del stock (usado al eliminar campañas o realizar traslados).
      */
     public boolean restarStock(String tipoDeseado, int volumen) {
         String tipoForm = tipoDeseado.toUpperCase().trim();
-        if (stockSangre.containsKey(tipoForm)) { // Verificar si el tipo de sangre existe en el mapa
+        if (stockSangre.containsKey(tipoForm)) {
             int volumenActual = stockSangre.get(tipoForm);
-            
-            if(volumenActual > volumen) { // Se resta el volumen 
-                stockSangre.replace(tipoForm, volumenActual - volumen);
-            } else {
-                stockSangre.replace(tipoForm, 0); // Si quedaria bajo 0, simplemente se asigna a 0 para evitar valores negativos
-            }
+            // Evita que el stock sea negativo
+            stockSangre.put(tipoForm, Math.max(0, volumenActual - volumen));
             return true;
         }
         return false;
     }
-    
 }
-

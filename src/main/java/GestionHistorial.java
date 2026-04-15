@@ -292,5 +292,21 @@ public class GestionHistorial {
         }
         return aptos;
     }
+    // Getters necesarios para que ArchivoUtil pueda acceder a los datos y guardarlos (SIA-11)
+
+    public List<Campaña> getCampañas() {
+        return campañas;
+    }
+
+    public Map<String, Donante> getVoluntarios() {
+        return voluntarios;
+    }
+
+    public Map<String, List<Extraccion>> getHistorial() {
+        return historial;
+    }
+    public Inventario getInv() {
+        return inv;
+    }
     
 }
