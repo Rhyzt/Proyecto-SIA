@@ -1,3 +1,8 @@
+package entidades;
+
+
+import entidades.Campaña;
+
 public class CampañaEnfocada extends Campaña {
     private String grupoObjetivo;
     private float bonoPrioridad;

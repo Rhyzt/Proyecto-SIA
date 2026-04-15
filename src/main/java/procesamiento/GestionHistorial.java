@@ -1,3 +1,10 @@
+package procesamiento;
+
+import exceptions.FrecuenciaDonacionException;
+import entidades.InfoDonacion;
+import entidades.Extraccion;
+import entidades.Donante;
+import entidades.Campaña;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -5,6 +12,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 public class GestionHistorial {
 
@@ -49,17 +58,11 @@ public class GestionHistorial {
     }
 
     /**
-     * Entrega informacion de todas las campañas presentes en la lista
+     * Obtiene todas las campañas presentes
+     * @return Una Lista con todas las campañas que existen en memoria
      */
-    public void listarCampañas() {
-        System.out.println("LISTADO DE CAMPAÑAS EN EL SISTEMA");
-        for (Campaña c : campañas) {
-            System.out.println("Nombre: " + c.getNombreCampaña() + " | Ubicacion: " + c.getUbicacion());
-            String fecha = c.getFechaCampaña().format(formatoFecha);
-            float litros = c.getMetaDonaciones() / 1000f;
-            System.out.println("Fecha: " + fecha + " | Meta: " + litros + "L");
-            System.out.println("----------------------------------------");
-        }
+    public List<Campaña> getListaCampañas() {
+        return new ArrayList<>(campañas); // Retorna una copia de la lista
     }
 
     /**
@@ -126,24 +129,17 @@ public class GestionHistorial {
     }
     
     /**
-     * Printea un listado de las extracciones asociadas con cierta campaña
-     * @param idCampaña 
+     * Obtiene las extracciones de una campaña en especifico
+     * @param idCampaña
+     * @return Una Lista con extracciones
      */
-    public void listarExtracciones(String idCampaña) {
-        List<Extraccion> lista = historial.get(idCampaña);
-
-        if (lista == null || lista.isEmpty()) { // Si la campaña no tiene ninguna extraccion registrada o no existe
-            System.out.println("No hay extracciones registradas para esta campaña.");
-            return;
+    public List<Extraccion> getlistaExtracciones(String idCampaña) {
+        List<Extraccion>lista = historial.get(idCampaña);
+        
+        if (lista == null) {
+            return new ArrayList<>();
         }
-
-        System.out.println("EXTRACCIONES DE LA CAMPAÑA: " + idCampaña);
-        for (Extraccion e : lista) { // Itera por caada una de las extracciones de una campaña y las muestra
-            System.out.println("Donante: " + e.getVoluntario().getNombre() +
-                               " | RUT: " + e.getVoluntario().getRut() +
-                               " | Volumen: " + e.getVolumenExtraido() + "ml" +
-                               " | ¿Se sintió mal?: " + (e.getSeSintioMal() ? "Sí" : "No"));
-        }
+        return new ArrayList<>(lista);
     }
     
     /**
@@ -291,6 +287,34 @@ public class GestionHistorial {
             }
         }
         return aptos;
+    }
+    /**
+     * Exporta los datos de los donantes aptos a un archivo de texto
+     * @param aptos
+     * @param nombreArchivo nombre del archivo que se va a exportar
+     * @return Un booleano que indica si se pudo exportar correctamente el archivo o no
+     */
+    public boolean exportarListaAptos(List<Donante> aptos, String nombreArchivo) {
+        if (aptos.isEmpty()) return false; // Se checkea si existen donantes aptos
+        
+        try (PrintWriter escritor = new PrintWriter(nombreArchivo)) {
+            escritor.println("=== LISTA DE CONTACTO PARA EMERGENCIA ===");
+            escritor.println("Tipo de Sangre Requerido: " + aptos.get(0).getTipoSangre());
+            escritor.println("Fecha de generación: " + LocalDate.now().format(formatoFecha));
+            escritor.println("-------------------------------------------");
+
+            for (Donante d : aptos) { // Se formatean los datos para que se vea mejor 
+                escritor.printf("Nombre: %-40s | Teléfono: %-16s | RUT: %s%n", 
+                              d.getNombre(), d.getTelefono(), d.getRut());
+            }
+
+            escritor.println("-------------------------------------------");
+            escritor.println("Total de donantes aptos encontrados: " + aptos.size());
+            return true;
+        } catch (IOException ex) {
+            System.out.println("Error al exportar el archivo: " + ex.getMessage());
+            return false;
+        }
     }
     
 }

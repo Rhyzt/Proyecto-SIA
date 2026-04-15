@@ -1,3 +1,6 @@
+package procesamiento;
+
+import entidades.Extraccion;
 import java.util.Map;
 import java.util.TreeMap;
 

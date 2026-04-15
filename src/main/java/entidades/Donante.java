@@ -1,3 +1,6 @@
+package entidades;  
+
+import exceptions.FrecuenciaDonacionException;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
