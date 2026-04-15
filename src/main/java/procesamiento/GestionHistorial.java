@@ -34,8 +34,29 @@ public class GestionHistorial {
         voluntarios = new HashMap<>();
         inv = new Inventario();
     }
-
     
+    //Getters
+    public List<Campaña> getCampañas() {
+        return campañas;
+    }
+
+    public Map<String, Donante> getVoluntarios() {
+        return voluntarios;
+    }
+
+    public Map<String, List<Extraccion>> getHistorial() {
+        return historial;
+    }
+    public Inventario getInv() {
+        return inv;
+    }
+    
+    
+    //Setters
+    public void setCampañas(List<Campaña> campañas) { this.campañas = campañas; }
+    public void setVoluntarios(Map<String, Donante> voluntarios) { this.voluntarios = voluntarios; }
+    public void setHistorial(Map<String, List<Extraccion>> historial) { this.historial = historial; }
+    public void setInv(Inventario inv) { this.inv = inv; }
     
     
     
@@ -288,6 +309,7 @@ public class GestionHistorial {
         }
         return aptos;
     }
+    
     /**
      * Exporta los datos de los donantes aptos a un archivo de texto
      * @param aptos
@@ -316,5 +338,4 @@ public class GestionHistorial {
             return false;
         }
     }
-    
 }
