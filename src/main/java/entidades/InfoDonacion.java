@@ -14,12 +14,12 @@ public class InfoDonacion {
     }
 
     //Getters
-    public String getNombreCampaña() { return idCampaña; }
+    public String getIdCampaña() { return idCampaña; }
     public int getVolumen() { return volumen; }
     public boolean getSeSintioMal() { return seSintioMal; }
 
     //Setters
-    public void setNombreCampaña(String idCampaña) { this.idCampaña = idCampaña; }
+    public void setIdCampaña(String idCampaña) { this.idCampaña = idCampaña; }
     public void setVolumen(int volumen) { this.volumen = volumen; }
     public void setSeSintioMal(boolean seSintioMal) { this.seSintioMal = seSintioMal; }
 }

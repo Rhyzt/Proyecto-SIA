@@ -40,11 +40,14 @@ public class ArchivoUtil {
         if (!f.exists()) return;
         try (BufferedReader br = new BufferedReader(new FileReader(f))) {
             String linea;
-            while ((linea = br.readLine()) != null) {
+            while ((linea = br.readLine()) != null) {   
                 String[] d = linea.split(",");
                 if (d.length < 5) continue;
+                
                 Campaña c = new Campaña(d[1], d[2], d[3], Integer.parseInt(d[4]));
-                sistema.agregarCampaña(c);
+                
+                c.setIdCampaña(d[0]); // Settear el id al real
+                sistema.agregarCampaña(c); 
             }
         } catch (Exception e) { System.err.println("Error campañas: " + e.getMessage()); }
     }
