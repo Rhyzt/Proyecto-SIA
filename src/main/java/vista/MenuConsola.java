@@ -26,8 +26,8 @@ public class MenuConsola {
             System.out.println("1. Administrar Campañas");
             System.out.println("2. Administrar Donantes");
             System.out.println("3. Administrar Extracciones");
-            System.out.println("4. Ver Inventario General");
-            System.out.println("5. Salir y Guardar");
+            System.out.println("5. Llamado de Emergencia"); // Nueva opción visible
+            System.out.println("6. Salir y Guardar");
             System.out.print("Seleccione una opción: ");
 
             try {
@@ -37,13 +37,14 @@ public class MenuConsola {
                     case 2: administrarDonantes(); break;
                     case 3: administrarExtracciones(); break;
                     case 4: mostrarInventario(); break;
-                    case 5: System.out.println("Guardando datos..."); break;
+                    case 5: llamadoEmergencia(); break;
+                    case 6: System.out.println("Guardando datos..."); break;
                     default: System.out.println("Opción no válida.");
                 }
             } catch (Exception e) {
                 System.out.println("Error: Ingrese un número válido.");
             }
-        } while (op != 5); 
+        } while (op != 6); 
     }
     
     //Metodos submenus
@@ -467,6 +468,7 @@ public class MenuConsola {
             String respuesta = leer.nextLine().toLowerCase();
             
             if (respuesta.equals("s")) {
+                crearCampanaEnfocada(tipo);
             }
         } else {
             System.out.println("❌ Error al exportar el archivo.");

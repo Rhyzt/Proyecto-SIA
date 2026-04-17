@@ -1,6 +1,7 @@
 package archivos;
 
 import entidades.Campaña;
+import entidades.CampañaEnfocada;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -44,7 +45,21 @@ public class ArchivoUtil {
                 String[] d = linea.split(",");
                 if (d.length < 5) continue;
                 
-                Campaña c = new Campaña(d[1], d[2], d[3], Integer.parseInt(d[4]));
+                Campaña c;
+                // Si tiene 7 o más columnas, es una CampañaEnfocada
+                if (d.length >= 7) {
+                    c = new CampañaEnfocada(
+                        d[1], 
+                        d[2], 
+                        d[3], 
+                        Integer.parseInt(d[4]), 
+                        d[5], 
+                        Float.parseFloat(d[6])  
+                    );
+                } else {
+                    // Es una campaña normal
+                    c = new Campaña(d[1], d[2], d[3], Integer.parseInt(d[4]));
+                }
                 
                 c.setIdCampaña(d[0]); // Settear el id al real
                 sistema.agregarCampaña(c); 
@@ -88,12 +103,19 @@ public class ArchivoUtil {
     private static void guardarCampanas(List<Campaña> campañas) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_CAMPANAS))) {
             for (Campaña c : campañas) {
-                pw.println(c.getIdCampaña() + "," + c.getNombreCampaña() + "," +
-                        c.getUbicacion() + "," + c.getFechaCampaña().format(fmt) +
-                        "," + c.getMetaDonaciones());
+                String linea = c.getIdCampaña() + "," + c.getNombreCampaña() + "," +
+                               c.getUbicacion() + "," + c.getFechaCampaña().format(fmt) +
+                               "," + c.getMetaDonaciones();
+
+                // Si es enfocada, agregamos sus campos únicos
+                if (c instanceof CampañaEnfocada) {
+                    CampañaEnfocada ce = (CampañaEnfocada) c;
+                    linea += "," + ce.getGrupoObjetivo() + "," + ce.getPorcentajeMeta();
+                }
+                pw.println(linea);
             }
         } catch (IOException e) { System.err.println("Error guardando campañas: " + e.getMessage()); }
-    }
+    } 
 
     private static void guardarExtracciones(Map<String, List<Extraccion>> historial) {
         try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_EXTRACCIONES))) {
