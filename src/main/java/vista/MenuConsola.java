@@ -1,17 +1,18 @@
 package vista;
 
 import entidades.Campaña;
+import entidades.CampañaEnfocada;
 import entidades.Donante;
 import entidades.Extraccion;
 import entidades.InfoDonacion;
 import procesamiento.GestionHistorial;
 import java.util.Scanner;
 import java.util.List;
-import java.util.Map;
 
 public class MenuConsola {
     private GestionHistorial sistema;
     private Scanner leer;
+    
 
     public MenuConsola(GestionHistorial sistema) {
         this.sistema = sistema;
@@ -169,8 +170,31 @@ public class MenuConsola {
         if (c != null) System.out.println("Nombre: " + c.getNombreCampaña() + " | Meta: " + c.getMetaDonaciones());
         else System.out.println("No encontrada.");
     }
+    
+    private void crearCampanaEnfocada(String grupoObjetivo) {
+        System.out.println("--- CONFIGURACION DE CAMPAÑA DE EMERGENCIA ---");
+        
+        //Parametros por defecto
+        String nombreCampaña = "(" + grupoObjetivo + ")Emergencia";
+        String sede = "SinSede";
+        int meta = 10000; // 10 litros
 
-    // --- MÉTODOS DE EDICIÓN ---   
+        // Parametros manuales
+        System.out.print("Ingrese la fecha de la campaña (dd/mm/yyyy): ");
+        String fecha = leer.nextLine();
+        
+
+        System.out.print("Ingrese el porcentaje objetivo del grupo (0 a 100): ");
+        float porcentajeMeta = Float.parseFloat(leer.nextLine()) / 100f;
+        
+        CampañaEnfocada nueva = sistema.crearCampañaEnfocada(nombreCampaña, sede, fecha, meta, grupoObjetivo, porcentajeMeta);
+        if (nueva != null)
+            System.out.println("Exito: Se ha creado la campaña con ID: " + nueva.getIdCampaña());
+        else 
+            System.out.println("Error: Ya existe una campaña con ese ID automatico.");
+    }
+    
+    // --- METODOS DE EDICIÓN ---   
     private void editarDonante() {
         System.out.print("RUT del donante a editar: ");
         String r = leer.nextLine();
@@ -341,7 +365,7 @@ public class MenuConsola {
                         System.out.println("\n=== HISTORIAL GENERAL PARA EL RUT: " + rut + " ===");
                         for (InfoDonacion info : historialCompleto) {
                             System.out.println("- Campaña: " + info.getIdCampaña() + 
-                                               " | Vol: " + info.getVolumen() + "ml" +
+                                               " | Vol: " + info.getVolumenExtraido() + "ml" +
                                                " | Malestar: " + (info.getSeSintioMal() ? "SI" : "NO"));
                         }
                     }
@@ -419,4 +443,35 @@ public class MenuConsola {
         }
     }
 
+    private void llamadoEmergencia() {
+        System.out.println("\n--- GENERAR LLAMADO DE EMERGENCIA ---");
+        System.out.print("Ingrese el tipo de sangre requerido (ej: O+, A-): ");
+        String tipo = leer.nextLine().toUpperCase();
+
+        // Se filtran los donantes aptos
+        List<Donante> aptos = sistema.filtroTipoAntiguedad(tipo);
+
+        if (aptos.isEmpty()) {
+            System.out.println("No se encontraron donantes aptos de tipo " + tipo + " en este momento.");
+            return;
+        }
+
+        System.out.println("✅ Se encontraron " + aptos.size() + " donantes aptos.");
+        System.out.print("Ingrese el nombre para el archivo de emergencia: ");
+        String nombreArchivo = leer.nextLine();
+
+        if (sistema.exportarListaAptos(aptos, nombreArchivo)) {
+            System.out.println("Archivo '" + nombreArchivo + "' generado exitosamente.");
+            
+            System.out.print("\n¿Desea crear una Campaña Enfocada para este caso? (s/n): ");
+            String respuesta = leer.nextLine().toLowerCase();
+            
+            if (respuesta.equals("s")) {
+            }
+        } else {
+            System.out.println("❌ Error al exportar el archivo.");
+        }
+    }
+    
+    
 }

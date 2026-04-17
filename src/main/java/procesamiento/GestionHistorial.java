@@ -5,11 +5,11 @@ import entidades.InfoDonacion;
 import entidades.Extraccion;
 import entidades.Donante;
 import entidades.Campaña;
+import entidades.CampañaEnfocada;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.io.PrintWriter;
@@ -182,9 +182,11 @@ public class GestionHistorial {
                     //Si se encuentra una extraccion coincidente, se crea un objeto InfoDonacion
                     if (e.getVoluntario().getRut().equalsIgnoreCase(rut)) {
                         coincidencias.add(new InfoDonacion(
-                            c.getIdCampaña(),
+                            e.getVoluntario(),
+                            e.getFechaExtraccion(),
                             e.getVolumenExtraido(),
-                            e.getSeSintioMal()
+                            e.getSeSintioMal(),
+                            c.getIdCampaña()
                         ));
                     }
                 }
@@ -370,7 +372,7 @@ public class GestionHistorial {
         List<InfoDonacion> listaE = buscarExtraccion(rut);
         int volumenTotal = 0;
         for (InfoDonacion inf : listaE) {
-            volumenTotal += inf.getVolumen();
+            volumenTotal += inf.getVolumenExtraido();
         }
         inv.restarStock(buscarDonante(rut).getTipoSangre(), volumenTotal); //Restado del inventario antiguo
         //Se añade al stock correspondiente
@@ -434,5 +436,30 @@ public class GestionHistorial {
             // Error al parsear la fecha
             return false;
         }
+    }
+    /**
+     * 
+     * @param nombreCampaña
+     * @param ubicacion
+     * @param fechaCampaña
+     * @param metaDonaciones
+     * @param grupoObjetivo
+     * @param porcentajeMeta
+     * @return 
+     */
+    public CampañaEnfocada crearCampañaEnfocada(String nombreCampaña, String ubicacion, String fechaCampaña, int metaDonaciones, String grupoObjetivo, float porcentajeMeta) {
+        CampañaEnfocada nueva = new CampañaEnfocada(
+            nombreCampaña,
+            ubicacion,
+            fechaCampaña, 
+            metaDonaciones,
+            grupoObjetivo, 
+            porcentajeMeta
+        );  
+        if(historial.containsKey(nueva.getIdCampaña())) return null;
+        
+        historial.put(nueva.getIdCampaña(), new ArrayList<>());
+        campañas.add(nueva);
+        return nueva;
     }
 }

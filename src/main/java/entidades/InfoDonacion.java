@@ -2,24 +2,18 @@ package entidades;
 
 import java.time.LocalDate;
 
-public class InfoDonacion {
+public class InfoDonacion extends Extraccion {
     private String idCampaña;
-    private int volumen;
-    private boolean seSintioMal;
 
-    public InfoDonacion(String idCampaña, int volumen, boolean seSintioMal) {
+    public InfoDonacion(Donante voluntario, LocalDate fechaExtraccion, int volumenExtraido, boolean seSintioMal, String idCampaña) {
+        super(voluntario, fechaExtraccion, volumenExtraido, seSintioMal);
         this.idCampaña = idCampaña;
-        this.volumen = volumen;
-        this.seSintioMal = seSintioMal;
     }
 
     //Getters
     public String getIdCampaña() { return idCampaña; }
-    public int getVolumen() { return volumen; }
-    public boolean getSeSintioMal() { return seSintioMal; }
 
     //Setters
     public void setIdCampaña(String idCampaña) { this.idCampaña = idCampaña; }
-    public void setVolumen(int volumen) { this.volumen = volumen; }
-    public void setSeSintioMal(boolean seSintioMal) { this.seSintioMal = seSintioMal; }
+ 
 }

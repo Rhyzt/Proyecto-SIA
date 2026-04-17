@@ -8,7 +8,6 @@ import procesamiento.GestionHistorial;
 import procesamiento.Validadores;
 import javax.swing.*;
 import java.awt.*;
-import java.util.Map;
 
 public class VentanaPrincipal extends JFrame {
     private GestionHistorial sistema;
@@ -219,7 +218,7 @@ public class VentanaPrincipal extends JFrame {
 
                     for (InfoDonacion info : lista) {
                         sb.append("Campaña: ").append(info.getIdCampaña())
-                          .append(" | Vol: ").append(info.getVolumen())
+                          .append(" | Vol: ").append(info.getVolumenExtraido())
                           .append(" | Malestar: ").append(info.getSeSintioMal() ? "SI" : "NO")
                           .append("\n");
                     }
