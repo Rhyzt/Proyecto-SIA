@@ -6,6 +6,7 @@ import entidades.Extraccion;
 import entidades.Donante;
 import entidades.Campaña;
 import entidades.CampañaEnfocada;
+import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -311,21 +312,34 @@ public class GestionHistorial {
     }
     
     /**
-     * Exporta los datos de los donantes aptos a un archivo de texto
-     * @param aptos
+     * Exporta los datos de los donantes aptos a un archivo .txt
+     * @param aptos Lista con donantes aptos
      * @param nombreArchivo nombre del archivo que se va a exportar
      * @return Un booleano que indica si se pudo exportar correctamente el archivo o no
      */
     public boolean exportarListaAptos(List<Donante> aptos, String nombreArchivo) {
-        if (aptos.isEmpty()) return false; // Se checkea si existen donantes aptos
+        if (aptos.isEmpty()) return false; 
         
-        try (PrintWriter escritor = new PrintWriter(nombreArchivo)) {
+        // Asegurar que exista la carpeta
+        File carpeta = new File("exports");
+        if (!carpeta.exists()) {
+            carpeta.mkdirs(); // Crea la carpeta si no existe
+        }
+        
+        //Convertir a .txt
+        if (!nombreArchivo.toLowerCase().endsWith(".txt"))
+            nombreArchivo += ".txt";
+        
+        // Definir la ruta final del archivo
+        File archivoDestino = new File(carpeta, nombreArchivo);
+
+        try (PrintWriter escritor = new PrintWriter(archivoDestino)) { 
             escritor.println("=== LISTA DE CONTACTO PARA EMERGENCIA ===");
             escritor.println("Tipo de Sangre Requerido: " + aptos.get(0).getTipoSangre());
             escritor.println("Fecha de generación: " + LocalDate.now().format(formatoFecha));
             escritor.println("-------------------------------------------");
 
-            for (Donante d : aptos) { // Se formatean los datos para que se vea mejor 
+            for (Donante d : aptos) { //Escribe la informacion de cada donante apto
                 escritor.printf("Nombre: %-40s | Teléfono: %-16s | RUT: %s%n", 
                               d.getNombre(), d.getTelefono(), d.getRut());
             }
