@@ -10,9 +10,9 @@ import entidades.Donante;
 import entidades.Extraccion;
 
 public class ArchivoUtil {
-    private static final String FILE_CAMPANAS = "campañas.csv";
-    private static final String FILE_DONANTES = "donantes.csv";
-    private static final String FILE_EXTRACCIONES = "extracciones.csv";
+    private static final String FILE_CAMPANAS = "csv/campañas.csv";
+    private static final String FILE_DONANTES = "csv/donantes.csv";
+    private static final String FILE_EXTRACCIONES = "csv/extracciones.csv";
     private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static void cargarTodo(GestionHistorial sistema) {
