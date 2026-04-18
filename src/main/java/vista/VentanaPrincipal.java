@@ -365,7 +365,6 @@ public class VentanaPrincipal extends JFrame {
         add(new JScrollPane(panelPrincipal));
     }
 
-
     private void mostrarScroll(String texto, String titulo) {
         JTextArea area = new JTextArea(texto);
         area.setEditable(false);

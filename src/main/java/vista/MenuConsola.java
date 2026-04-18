@@ -156,6 +156,19 @@ public class MenuConsola {
         System.out.println("Meta (ml): "); int m = Integer.parseInt(leer.nextLine());
         if (sistema.agregarCampaña(new Campaña(n, u, f, m))) System.out.println("Campaña creada.");
     }
+    
+    private void registrarExtraccion() {
+        System.out.println("ID Campaña: "); String id = leer.nextLine();
+        System.out.println("RUT Donante: "); String rut = leer.nextLine();
+        Campaña c = sistema.buscarCampaña(id);
+        Donante d = sistema.buscarDonante(rut);
+        if (c != null && d != null) {
+            System.out.println("Volumen (ml): ");
+            int v = Integer.parseInt(leer.nextLine());
+            sistema.registrarExtraccion(id, new Extraccion(d, c.getFechaCampaña(), v, false));
+            System.out.println("Exito.");
+        }
+    }
 
     // --- MÉTODOS DE BÚSQUEDA ---
     private void buscarDonante() {
@@ -284,6 +297,44 @@ public class MenuConsola {
         }
     }
 
+    private void editarExtraccion() {
+        System.out.println("ID de la Campaña: "); String id = leer.nextLine();
+        System.out.println("RUT actual del Donante: "); String rutV = leer.nextLine();
+
+        Extraccion e = sistema.buscarExtraccion(rutV, id);
+        if (e != null) {
+            System.out.println("--- Presione Enter para mantener el valor actual ---");
+
+            // Editar RUT
+            System.out.println("Nuevo RUT [" + e.getVoluntario().getRut() + "]: ");
+            String rutN = leer.nextLine();
+            if (rutN.isEmpty()) rutN = e.getVoluntario().getRut();
+
+            // Editar Fecha
+            System.out.println("Nueva Fecha [" + e.getFechaExtraccion() + "]: ");
+            String fecha = leer.nextLine();
+            if (fecha.isEmpty()) fecha = e.getFechaExtraccion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+
+            // Editar Volumen
+            System.out.println("Nuevo Volumen [" + e.getVolumenExtraido() + "]: ");
+            String volStr = leer.nextLine();
+            int vol = volStr.isEmpty() ? e.getVolumenExtraido() : Integer.parseInt(volStr);
+
+            // Editar seSintioMal
+            System.out.println("¿Se Sintio Mal? (actual: " + e.getSeSintioMal() + ") [true/false]: ");
+            String malStr = leer.nextLine();
+            boolean mal = malStr.isEmpty() ? e.getSeSintioMal() : Boolean.parseBoolean(malStr);
+
+            if (sistema.actualizarExtraccion(rutV, id, rutN, fecha, vol, mal)) {
+                System.out.println("Donacion actualizada correctamente.");
+            } else {
+                System.out.println("Error al actualizar. Verifique datos.");
+            }
+        } else {
+            System.out.println("Extraccion no encontrada.");
+        }
+    }
+    
     // --- MÉTODOS DE ELIMINACIÓN ---
     private void eliminarDonante() {
         System.out.println("RUT: ");
@@ -298,6 +349,17 @@ public class MenuConsola {
             System.out.println("No se encontro la campaña especificada.");
     }
 
+    private void eliminarExtraccion() {
+        System.out.println("ID de la Campaña: "); String id = leer.nextLine();
+        System.out.println("RUT del Donante: "); String rut = leer.nextLine();
+        
+        if (sistema.borrarExtraccion(id, rut)) {
+            System.out.println("Donacion eliminada");
+        } else {
+            System.out.println("No se encontro la donacion..");
+        }
+    }
+    
     // --- MÉTODOS DE LISTADO ---
     private void listarDonantes() {
         System.out.println("\n--- LISTADO DE DONANTES ---");
@@ -316,21 +378,6 @@ public class MenuConsola {
         sistema.getInv().getStockSangre().forEach((k, v) -> System.out.println(k + ": " + v + "ml"));
     }
 
-    
-// Metodos de extracciones
-    private void registrarExtraccion() {
-        System.out.println("ID Campaña: "); String id = leer.nextLine();
-        System.out.println("RUT Donante: "); String rut = leer.nextLine();
-        Campaña c = sistema.buscarCampaña(id);
-        Donante d = sistema.buscarDonante(rut);
-        if (c != null && d != null) {
-            System.out.println("Volumen (ml): ");
-            int v = Integer.parseInt(leer.nextLine());
-            sistema.registrarExtraccion(id, new Extraccion(d, c.getFechaCampaña(), v, false));
-            System.out.println("Exito.");
-        }
-    }
-    
     private void listarExtraccionesPorCampaña() {
         System.out.println("Ingrese ID de la Campaña: ");
         String id = leer.nextLine();
@@ -403,56 +450,8 @@ public class MenuConsola {
             System.out.println("Error: Ingrese un numero valido.");
         }
     }
-
-    private void editarExtraccion() {
-    System.out.println("ID de la Campaña: "); String id = leer.nextLine();
-    System.out.println("RUT actual del Donante: "); String rutV = leer.nextLine();
     
-    Extraccion e = sistema.buscarExtraccion(rutV, id);
-    if (e != null) {
-        System.out.println("--- Presione Enter para mantener el valor actual ---");
-
-        // Editar RUT
-        System.out.println("Nuevo RUT [" + e.getVoluntario().getRut() + "]: ");
-        String rutN = leer.nextLine();
-        if (rutN.isEmpty()) rutN = e.getVoluntario().getRut();
-
-        // Editar Fecha
-        System.out.println("Nueva Fecha [" + e.getFechaExtraccion() + "]: ");
-        String fecha = leer.nextLine();
-        if (fecha.isEmpty()) fecha = e.getFechaExtraccion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-
-        // Editar Volumen
-        System.out.println("Nuevo Volumen [" + e.getVolumenExtraido() + "]: ");
-        String volStr = leer.nextLine();
-        int vol = volStr.isEmpty() ? e.getVolumenExtraido() : Integer.parseInt(volStr);
-
-        // Editar seSintioMal
-        System.out.println("¿Se Sintio Mal? (actual: " + e.getSeSintioMal() + ") [true/false]: ");
-        String malStr = leer.nextLine();
-        boolean mal = malStr.isEmpty() ? e.getSeSintioMal() : Boolean.parseBoolean(malStr);
-        
-        if (sistema.actualizarExtraccion(rutV, id, rutN, fecha, vol, mal)) {
-            System.out.println("Donacion actualizada correctamente.");
-        } else {
-            System.out.println("Error al actualizar. Verifique datos.");
-        }
-    } else {
-        System.out.println("Extraccion no encontrada.");
-    }
-}
-
-    private void eliminarExtraccion() {
-        System.out.println("ID de la Campaña: "); String id = leer.nextLine();
-        System.out.println("RUT del Donante: "); String rut = leer.nextLine();
-        
-        if (sistema.borrarExtraccion(id, rut)) {
-            System.out.println("Donacion eliminada");
-        } else {
-            System.out.println("No se encontro la donacion..");
-        }
-    }
-
+// Metodos Varios
     private void llamadoEmergencia() {
         System.out.println("\n--- GENERAR LLAMADO DE EMERGENCIA ---");
         System.out.println("Ingrese el tipo de sangre requerido (ej: O+, A-): ");
