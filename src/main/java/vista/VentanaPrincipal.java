@@ -1,11 +1,11 @@
 package vista;
 
+import exceptions.EdadNoValidaException;
 import entidades.Campaña;
 import entidades.Donante;
 import entidades.Extraccion;
 import entidades.InfoDonacion;
 import procesamiento.GestionHistorial;
-import procesamiento.Validadores;
 import javax.swing.*;
 import java.awt.*;
 
@@ -138,13 +138,28 @@ public class VentanaPrincipal extends JFrame {
 
         // REGISTROS
         btnRegDonante.addActionListener(e -> {
-            String nom = JOptionPane.showInputDialog("Nombre:");
-            String rut = JOptionPane.showInputDialog("RUT:");
-            int edad = Integer.parseInt(JOptionPane.showInputDialog("Edad:"));
-            String tipo = JOptionPane.showInputDialog("Tipo de Sangre (Ej: O+):");
-            String tel = JOptionPane.showInputDialog("Teléfono:");
-            if(sistema.agregarDonante(new Donante(nom, rut, edad, "M", tipo, "01/01/2000", tel)))
-                JOptionPane.showMessageDialog(this, "Donante registrado.");
+            try {
+                String nom = JOptionPane.showInputDialog("Nombre:");
+                String rut = JOptionPane.showInputDialog("RUT:");
+
+                int edad = Integer.parseInt(JOptionPane.showInputDialog("Edad:"));
+                
+                if (edad < 18 || edad > 65) throw new EdadNoValidaException(edad);
+
+                String tipo = JOptionPane.showInputDialog("Tipo de Sangre (Ej: O+):");
+                String tel = JOptionPane.showInputDialog("Teléfono:");
+
+                Donante d = new Donante(nom, rut, edad, "M", tipo, "01/01/2000", tel);
+
+                if (sistema.agregarDonante(d)) {
+                    JOptionPane.showMessageDialog(this, "Donante registrado.");
+                }
+
+            } catch (EdadNoValidaException ex) {
+                JOptionPane.showMessageDialog(this, ex.getMessage());
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Debe ingresar una edad válida.");
+            }
         });
 
         btnRegCampana.addActionListener(e -> {

@@ -1,5 +1,6 @@
 package vista;
 
+import exceptions.EdadNoValidaException;
 import entidades.Campaña;
 import entidades.CampañaEnfocada;
 import entidades.Donante;
@@ -139,13 +140,34 @@ public class MenuConsola {
     
     // --- MÉTODOS DE REGISTRO ---
     private void registrarDonante() {
-        System.out.println("Nombre: "); String n = leer.nextLine();
-        System.out.println("RUT: "); String r = leer.nextLine();
-        System.out.println("Edad: "); int e = Integer.parseInt(leer.nextLine());
-        System.out.println("Tipo Sangre: "); String t = leer.nextLine();
-        System.out.println("Teléfono: "); String tel = leer.nextLine();
-        if (sistema.agregarDonante(new Donante(n, r, e, "M", t, "01/01/2000", tel))) {
-            System.out.println("Donante registrado.");
+        try {
+            System.out.println("Nombre: "); 
+            String n = leer.nextLine();
+
+            System.out.println("RUT: "); 
+            String r = leer.nextLine();
+
+            System.out.println("Edad: "); 
+            int e = Integer.parseInt(leer.nextLine());
+            
+            if (e < 18 || e > 65) throw new EdadNoValidaException(e);
+
+            System.out.println("Tipo Sangre: "); 
+            String t = leer.nextLine();
+
+            System.out.println("Teléfono: "); 
+            String tel = leer.nextLine();
+
+            Donante d = new Donante(n, r, e, "M", t, "01/01/2000", tel);
+
+            if (sistema.agregarDonante(d)) {
+                System.out.println("Donante registrado.");
+            }
+
+        } catch (EdadNoValidaException ex) {
+            System.out.println(ex.getMessage());
+        } catch (NumberFormatException ex) {
+            System.out.println("Debe ingresar un número válido para la edad.");
         }
     }
 
