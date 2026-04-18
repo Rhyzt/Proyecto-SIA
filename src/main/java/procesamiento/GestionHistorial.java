@@ -24,7 +24,7 @@ public class GestionHistorial {
     // ArrayList necesario para poder realizar operaciones sobre las campañas y Mapa para los donantes
     private List<Campaña> campañas;
     private Map<String, Donante> voluntarios;
-    private Inventario inv;
+    private Inventario inv; 
     
     //Constante usada para formatear 
     private static final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -155,15 +155,14 @@ public class GestionHistorial {
      * @param idCampaña
      * @return Una Lista con extracciones
      */
-    public List<Extraccion> getlistaExtracciones(String idCampaña) {
-        List<Extraccion>lista = historial.get(idCampaña);
-        
-        if (lista == null) {
-            return new ArrayList<>();
-        }
-        return new ArrayList<>(lista);
-    }
+    public List<Extraccion> getListaExtracciones(String idCampaña) {
+    List<Extraccion> lista = historial.get(idCampaña);
     
+    if (lista == null)
+        return null;
+    return new ArrayList<>(lista);
+}
+   
     /**
      * Busca en el mapa todas las extracciones que pertenezcan al rut dado.
      * @param rut
@@ -229,15 +228,6 @@ public class GestionHistorial {
             }
             return false;
         });
-    }
-    
-    /**
-     * Obtiene las extracciones de una campaña especifica
-     * @param idCampaña
-     * @return Una Lista de Extracciones correspondientes a la campaña indicada, si no existia esta campaña, retorna null
-     */
-    public List<Extraccion> listaExtracciones(String idCampaña) {
-        return historial.get(idCampaña);
     }
     
     

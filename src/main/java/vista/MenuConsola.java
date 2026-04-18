@@ -334,7 +334,7 @@ public class MenuConsola {
     private void listarExtraccionesPorCampaña() {
         System.out.println("Ingrese ID de la Campaña: ");
         String id = leer.nextLine();
-        List<Extraccion> lista = sistema.listaExtracciones(id); 
+        List<Extraccion> lista = sistema.getListaExtracciones(id); 
         
         if (lista != null && !lista.isEmpty()) {
             System.out.println("\n--- DONACIONES EN: " + id + " ---");

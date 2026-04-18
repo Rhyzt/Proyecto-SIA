@@ -336,7 +336,7 @@ public class VentanaPrincipal extends JFrame {
         
         btnListExtracciones.addActionListener(e -> {
             String id = JOptionPane.showInputDialog(this, "Ingrese ID de la Campaña:");
-            java.util.List<Extraccion> lista = sistema.listaExtracciones(id);
+            java.util.List<Extraccion> lista = sistema.getListaExtracciones(id);
 
             if (lista != null && !lista.isEmpty()) {
                 StringBuilder sb = new StringBuilder("--- DONACIONES EN: " + id + " ---\n");
