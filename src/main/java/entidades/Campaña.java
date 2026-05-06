@@ -35,4 +35,9 @@ public class Campaña {
     public void setUbicacion(String ubicacion){ this.ubicacion = ubicacion; }
     public void setFechaCampaña(LocalDate fechaCampaña){ this.fechaCampaña = fechaCampaña; }
     public void setMetaDonaciones(int metaDonaciones){ this.metaDonaciones = metaDonaciones; }
+    
+    //Metodos
+    public String obtenerResumen() {
+        return this.idCampaña + " | Meta: " + this.metaDonaciones + "ml";
+    }
 }

@@ -39,6 +39,11 @@ public class Donante extends Persona {
         System.out.println("Fecha ultima donacion: " + fechaFormateada);
         System.out.println("Numero Telefonico: " + telefono);        
     }
+    
+    public String obtenerResumenReducido() {
+        return getRut() + " | " + getNombre() + " | " + getTipoSangre();
+    }   
+    
     /**
      * Revisa si el donante es apto para donar y si no arroja FrecuenciaDonacionException
      * @param fechaCampaña

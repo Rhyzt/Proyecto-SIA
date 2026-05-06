@@ -24,7 +24,7 @@ public class GestionHistorial {
     // ArrayList necesario para poder realizar operaciones sobre las campañas y Mapa para los donantes
     private List<Campaña> campañas;
     private Map<String, Donante> voluntarios;
-    private Inventario inv; 
+    private Inventario inv;
     
     //Constante usada para formatear 
     private static final DateTimeFormatter formatoFecha = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -36,33 +36,20 @@ public class GestionHistorial {
         inv = new Inventario();
     }
     
-    //Getters
-    public List<Campaña> getCampañas() {
-        return campañas;
+    //Getters copias
+    public List<Campaña> obtenerCopiaCampañas() {
+        return new ArrayList<>(this.campañas);
+    }
+    
+    public Map<String, Donante> obtenerCopiaVoluntarios() {
+        return new HashMap<>(this.voluntarios);
+    }
+    
+    public Map<String, List<Extraccion>> obtenerCopiaHistorial() {
+        return new HashMap<>(this.historial);
     }
 
-    public Map<String, Donante> getVoluntarios() {
-        return voluntarios;
-    }
 
-    public Map<String, List<Extraccion>> getHistorial() {
-        return historial;
-    }
-    public Inventario getInv() {
-        return inv;
-    }
-    
-    
-    //Setters
-    public void setCampañas(List<Campaña> campañas) { this.campañas = campañas; }
-    public void setVoluntarios(Map<String, Donante> voluntarios) { this.voluntarios = voluntarios; }
-    public void setHistorial(Map<String, List<Extraccion>> historial) { this.historial = historial; }
-    public void setInv(Inventario inv) { this.inv = inv; }
-    
-    
-    
-    
-    
     //Metodos Campaña
     /**
      * Agrega una campaña a la lista y al mapa.
@@ -465,5 +452,27 @@ public class GestionHistorial {
         historial.put(nueva.getIdCampaña(), new ArrayList<>());
         campañas.add(nueva);
         return nueva;
+    }
+
+
+//Metodos varios
+    public List<String> obtenerListaCampañas() {
+        List<String> listaResumenes = new ArrayList<>();
+        for (Campaña c : campañas) {
+            listaResumenes.add(c.obtenerResumen());
+        }
+        return listaResumenes;
+    }
+    
+    public List<String> obtenerListaVoluntarios() {
+        List<String> listaResumenes = new ArrayList<>();
+        for (Donante d : voluntarios.values()) {
+            listaResumenes.add(d.obtenerResumenReducido());
+        }
+        return listaResumenes;
+    }
+    
+    public List<String> obtenerResumenInventario() {
+        return inv.obtenerEstadoInventario(); 
     }
 }

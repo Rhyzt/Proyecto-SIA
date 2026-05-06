@@ -131,8 +131,14 @@ public class VentanaPrincipal extends JFrame {
         
         btnInventario.addActionListener(e -> {
             StringBuilder sb = new StringBuilder("--- INVENTARIO ---\n");
-            sistema.getInv().getStockSangre().forEach((tipo, cant) ->
-                    sb.append(tipo).append(": ").append(cant).append(" ml\n"));
+            java.util.List<String> inventarioResumen = sistema.obtenerResumenInventario();
+            if (inventarioResumen.isEmpty()) {
+                sb.append("No hay extracciones registradas en el sistema.\n");
+            } else {
+                for (String resumen : inventarioResumen) {
+                    sb.append(resumen).append("\n");
+                }
+            } 
             JOptionPane.showMessageDialog(this, sb.toString());
         });
 
@@ -337,15 +343,31 @@ public class VentanaPrincipal extends JFrame {
         // LISTADOS
         btnListDonantes.addActionListener(e -> {
             StringBuilder sb = new StringBuilder("--- DONANTES REGISTRADOS ---\n");
-            sistema.getVoluntarios().values().forEach(d ->
-                    sb.append(d.getRut()).append(" | ").append(d.getNombre()).append("\n"));
+            
+            java.util.List<String> resumenesDonantes = sistema.obtenerListaVoluntarios();
+            if (resumenesDonantes.isEmpty()) {
+                sb.append("No hay donantes registrados en el sistema.\n");
+            } else {
+                for (String resumen : resumenesDonantes) {
+                    sb.append(resumen).append("\n");
+                }
+            } 
+            
             mostrarScroll(sb.toString(), "Listado de Donantes");
         });
 
         btnListCampanas.addActionListener(e -> {
             StringBuilder sb = new StringBuilder("--- CAMPAÑAS REGISTRADAS ---\n");
-            sistema.getCampañas().forEach(c ->
-                    sb.append(c.getIdCampaña()).append(" | ").append(c.getNombreCampaña()).append("\n"));
+            
+            java.util.List<String> resumenesCampañas = sistema.obtenerListaCampañas();
+            if (resumenesCampañas.isEmpty()) {
+                sb.append("No hay campañas registradas en el sistema.\n");
+            } else {
+                for (String resumen : resumenesCampañas) {
+                    sb.append(resumen).append("\n");
+                }
+            }
+            
             mostrarScroll(sb.toString(), "Listado de Campañas");
         });
         

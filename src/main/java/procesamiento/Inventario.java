@@ -2,6 +2,8 @@
 
 import entidades.Donante;
 import entidades.Extraccion;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -12,15 +14,6 @@ public class Inventario {
         // Para que los tipos esten ordenados alfabeticamente, se usaran en mayuscula (ej. AB+)
         stockSangre = new TreeMap<>();
     }
-    
-    //Getters
-    public Map<String, Integer> getStockSangre() { return stockSangre; }
-    
-    //Setters
-    public void setStockSangre(Map<String, Integer> stockSangre) { this.stockSangre = stockSangre; }
-    
-    
-    
 
     /**
      * Registra el ingreso de sangre al stock tras una extracción.
@@ -75,5 +68,12 @@ public class Inventario {
             return true;
         }
         return false;
+    }
+    
+    //Metodos varios
+        public List<String> obtenerEstadoInventario() {
+        List<String> estadoInv = new ArrayList<>();
+        stockSangre.forEach((k, v) -> estadoInv.add(k + ": " + v + "ml"));
+        return estadoInv;
     }
 }

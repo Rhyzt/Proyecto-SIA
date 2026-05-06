@@ -85,9 +85,9 @@ public class ArchivoUtil {
     }
 
     public static void guardarTodo(GestionHistorial sistema) {
-        guardarDonantes(sistema.getVoluntarios());
-        guardarCampanas(sistema.getCampañas());
-        guardarExtracciones(sistema.getHistorial());
+        guardarDonantes(sistema.obtenerCopiaVoluntarios());
+        guardarCampanas(sistema.obtenerCopiaCampañas());
+        guardarExtracciones(sistema.obtenerCopiaHistorial());
     }
 
     private static void guardarDonantes(Map<String, Donante> voluntarios) {

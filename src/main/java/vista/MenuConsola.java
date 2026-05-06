@@ -385,19 +385,36 @@ public class MenuConsola {
     // --- MÉTODOS DE LISTADO ---
     private void listarDonantes() {
         System.out.println("\n--- LISTADO DE DONANTES ---");
-        sistema.getVoluntarios().values().forEach(d ->
-                System.out.println(d.getRut() + " | " + d.getNombre() + " | " + d.getTipoSangre()));
+        List<String> resumenes = sistema.obtenerListaVoluntarios();
+        if(resumenes.isEmpty()) {
+            System.out.println("No hay donantes registrados.");
+        } else {
+            resumenes.forEach(donante ->
+                System.out.println(donante));
+        }
     }
 
     private void listarCampanas() {
         System.out.println("\n--- LISTADO DE CAMPAÑAS ---");
-        sistema.getCampañas().forEach(c ->
-                System.out.println(c.getIdCampaña() + " | Meta: " + c.getMetaDonaciones() + "ml"));
+        List<String> resumenes = sistema.obtenerListaCampañas();
+        if(resumenes.isEmpty()) {
+            System.out.println("No hay campañas registradas.");
+        } else {
+            resumenes.forEach(resumenC ->
+                System.out.println(resumenC));
+        }
     }
 
     private void mostrarInventario() {
-        System.out.println("\n--- INVENTARIO ---");
-        sistema.getInv().getStockSangre().forEach((k, v) -> System.out.println(k + ": " + v + "ml"));
+        System.out.println("\n---  INVENTARIO ---");
+        List<String> inventarioResumen = sistema.obtenerResumenInventario();
+        
+        if(inventarioResumen.isEmpty()) {
+            System.out.println("No hay extracciones registradas");
+        } else {
+            inventarioResumen.forEach(tipoResumen ->
+                System.out.println(tipoResumen));
+        }
     }
 
     private void listarExtraccionesPorCampaña() {
