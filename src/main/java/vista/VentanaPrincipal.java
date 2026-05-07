@@ -5,6 +5,7 @@ import entidades.Campaña;
 import entidades.Donante;
 import entidades.Extraccion;
 import entidades.InfoDonacion;
+import procesamiento.Validadores;
 import procesamiento.GestionHistorial;
 import javax.swing.*;
 import java.awt.*;
@@ -204,7 +205,7 @@ public class VentanaPrincipal extends JFrame {
 
                 int edad = Integer.parseInt(JOptionPane.showInputDialog("Edad:"));
                 
-                if (edad < 18 || edad > 65) throw new EdadNoValidaException(edad);
+                Validadores.validarEdad(edad); 
 
                 String tipo = JOptionPane.showInputDialog("Tipo de Sangre (Ej: O+):");
                 String tel = JOptionPane.showInputDialog("Teléfono:");

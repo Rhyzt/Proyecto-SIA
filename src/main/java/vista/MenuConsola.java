@@ -7,6 +7,7 @@ import entidades.Donante;
 import entidades.Extraccion;
 import entidades.InfoDonacion;
 import procesamiento.GestionHistorial;
+import procesamiento.Validadores;
 import java.util.Scanner;
 import java.util.List;
 
@@ -175,7 +176,7 @@ public class MenuConsola {
             System.out.println("Edad: "); 
             int e = Integer.parseInt(leer.nextLine());
             
-            if (e < 18 || e > 65) throw new EdadNoValidaException(e);
+            Validadores.validarEdad(e); 
 
             System.out.println("Tipo Sangre: "); 
             String t = leer.nextLine();

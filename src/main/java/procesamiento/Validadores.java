@@ -1,5 +1,7 @@
 package procesamiento;
 
+import exceptions.EdadNoValidaException;
+
 public class Validadores {
     
     // ============ CONSTANTES VÁLIDAS ============
@@ -179,14 +181,10 @@ public class Validadores {
                "Solo se permiten letras, espacios, guiones y apóstrofes.";
     }
     
-    // ============ VALIDACIÓN DE EDAD ============
-    
-    public static boolean esEdadValida(int edad) {
-        return edad >= 18 && edad <= 65;
-    }
-    
-    public static String obtenerMensajeErrorEdad(int edad) {
-        return "La edad debe estar entre 18 y 65 años. " +
-               "Ingresaste: " + edad + " años";
-    }
+    // ============ VALIDACIÓN DE EDAD ============    
+    public static void validarEdad(int edad) throws EdadNoValidaException {
+        if (edad < 18 || edad > 65) {
+            throw new EdadNoValidaException(edad);
+        }
+    } 
 }

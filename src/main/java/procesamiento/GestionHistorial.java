@@ -291,6 +291,7 @@ public class GestionHistorial {
                    if (d.esAptoParaDonar(LocalDate.now()))
                        aptos.add(d);
                 } catch (FrecuenciaDonacionException ex) {
+                        System.out.println(ex.getMessage());
                     // Se ignora, dono recientemente por lo que no es apto
                 }
             }
