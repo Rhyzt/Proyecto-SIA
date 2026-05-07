@@ -1,6 +1,6 @@
 package entidades;
 
-public abstract class Persona {
+public abstract class Persona implements procesamiento.Validadores {
     private String nombre;
     private String rut;
     private int edad;
@@ -31,5 +31,17 @@ public abstract class Persona {
         System.out.println("Rut: " + rut);
         System.out.println("edad: " + edad);
         System.out.println("Sexo: " + sexo);
+    }
+    
+    @Override
+    public void validar() throws Exception {
+        //Valida que el rut sea valido
+        if (!procesamiento.Validadores.esRutValido(this.rut)) {
+            throw new Exception(procesamiento.Validadores.obtenerMensajeErrorRUT(this.rut));
+        }
+        // Valida que el nombre no tenga caracteres invalidos
+        if (!procesamiento.Validadores.esNombreValido(this.nombre)) {
+            throw new Exception(procesamiento.Validadores.obtenerMensajeErrorNombre());
+        }
     }
 }

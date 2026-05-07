@@ -1,7 +1,6 @@
 package entidades;  
 
 import exceptions.FrecuenciaDonacionException;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
 
@@ -59,5 +58,22 @@ public class Donante extends Persona {
         return true;
     }
     
-    
+    @Override
+    public void validar() throws Exception {
+        // Validaciones de la clase padre
+        super.validar();
+        
+        // Valida la edad
+        procesamiento.Validadores.validarEdad(this.getEdad());
+        
+        // Valida el sexo
+        if (!procesamiento.Validadores.esSexoValido(this.getSexo())) {
+            throw new Exception(procesamiento.Validadores.obtenerMensajeErrorSexo());
+        }
+        
+        // Valida el numero telefonico
+        if (!procesamiento.Validadores.esTelefonoValido(this.telefono)) {
+            throw new Exception(procesamiento.Validadores.obtenerMensajeErrorTelefono(this.telefono));
+        }
+    }
 }

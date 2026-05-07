@@ -2,187 +2,89 @@ package procesamiento;
 
 import exceptions.EdadNoValidaException;
 
-public class Validadores {
+public interface Validadores {
     
-    // ============ CONSTANTES VÁLIDAS ============
-    private static final String[] SEXOS_DISPONIBLES = {
-        "M", "F", "Otro"
-    };
-    private static final String[] TIPOS_SANGRE_VALIDOS = {
-        "O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"
-    };
-    
-    private static final int LONGITUD_RUT_MINIMA = 8;
-    private static final int LONGITUD_TELEFONO_MINIMA = 8;
-    private static final int LONGITUD_TELEFONO_MAXIMA = 15;
-    
-    // ============ VALIDACIÓN DE RUT ============
+    void validar() throws Exception;
 
-    /**
-     * Valida un RUT chileno (formato básico, sin verificar dígito verificador).
-     * 
-     * @param rut el RUT a validar (puede tener o no puntos/guión)
-     * @return true si el RUT tiene formato válido (8+ dígitos)
-     */
-    public static boolean esRutValido(String rut) {
-        if (rut == null || rut.trim().isEmpty()) {
-            return false;
-        }
+    // ============ CONSTANTES VALIDAS ============
+    String[] SEXOS_DISPONIBLES = {"M", "F", "Otro"};
     
-        // Remover puntos, guiones y espacios
-        String rutLimpio = rut.replaceAll("[\\-\\.]\\s", "").trim().toUpperCase();
+    int LONGITUD_RUT_MINIMA = 8;
+    int LONGITUD_TELEFONO_MINIMA = 8;
+    int LONGITUD_TELEFONO_MAXIMA = 15;
     
-        // Debe tener al menos 8 caracteres
-        if (rutLimpio.length() < LONGITUD_RUT_MINIMA) {
-            return false;
-        }
-    
-        // Debe contener solo dígitos (y opcionalmente K al final)
-        if (!rutLimpio.matches("\\d+[0-9K]?")) {
-            return false;
-        }
-    
-        return true;
+    // ============ MÉTODOS ESTÁTICOS DE UTILIDAD ============
+    static boolean esRutValido(String rut) {
+        if (rut == null || rut.trim().isEmpty()) return false;
+
+        // CORRECCIÓN: Ahora borra puntos, guiones O espacios en cualquier lugar
+        String rutLimpio = rut.replaceAll("[\\-\\.\\s]", "").trim().toUpperCase();
+
+        if (rutLimpio.length() < LONGITUD_RUT_MINIMA) return false;
+
+        // Verifica que todo sean números y termine en un número o K
+        return rutLimpio.matches("^[0-9]+[0-9K]$"); 
     }
 
-    public static String obtenerMensajeErrorRUT(String rut) {
-        if (rut == null || rut.trim().isEmpty()) {
-            return "El RUT no puede estar vacío";
-        }
-    
-        String rutLimpio = rut.replaceAll("[\\-\\.]\\s", "").trim();
-    
+    static String obtenerMensajeErrorRUT(String rut) {
+        if (rut == null || rut.trim().isEmpty()) return "El RUT no puede estar vacío";
+        
+        // 1 y 2. CORRECCIÓN: Mismo regex del validador y agregamos toUpperCase()
+        String rutLimpio = rut.replaceAll("[\\-\\.\\s]", "").trim().toUpperCase();
+        
         if (rutLimpio.length() < LONGITUD_RUT_MINIMA) {
-            return "El RUT debe tener al menos " + LONGITUD_RUT_MINIMA + 
-               " caracteres. Ingresaste: " + rutLimpio.length();
+            return "El RUT debe tener al menos " + LONGITUD_RUT_MINIMA + " caracteres.";
         }
-    
-        if (!rutLimpio.matches("\\d+[0-9K]?")) {
-            return "El RUT debe contener solo números (y opcionalmente K al final). " +
-            "Ejemplos válidos: 12345678, 12.345.678, 12345678-K";
+        
+        // 3. CORRECCIÓN: Misma validación estricta que arriba
+        if (!rutLimpio.matches("^[0-9]+[0-9K]$")) {
+            return "El RUT debe contener solo números (y opcionalmente K al final).";
         }
-    
+        
         return "Formato de RUT inválido.";
     }
     
-    // ============ VALIDACIÓN DE TIPO DE SANGRE ============
-    
-    public static boolean esTipoSangreValido(String tipoSangre) {
-        if (tipoSangre == null || tipoSangre.trim().isEmpty()) {
-            return false;
-        }
-        
-        String tipoNormalizado = tipoSangre.trim().toUpperCase();
-        
-        for (String tipo : TIPOS_SANGRE_VALIDOS) {
-            if (tipo.equals(tipoNormalizado)) {
-                return true;
-            }
-        }
-        
-        return false;
-    }
-    
-    public static String[] obtenerTiposSangreValidos() {
-        return TIPOS_SANGRE_VALIDOS.clone();
-    }
-    
-    public static String obtenerMensajeErrorTipoSangre() {
-        return "Tipo de sangre inválido. Tipos válidos: " + 
-               String.join(", ", TIPOS_SANGRE_VALIDOS);
-    }
-    
-    // ============ VALIDACIÓN DE SEXO ============
-    /**
-     * Valida que el sexo sea uno de los valores permitidos.
-     * 
-     * @param sexo el sexo a validar
-     * @return true si es un sexo válido
-     */
-    public static boolean esSexoValido(String sexo) {
-        if (sexo == null || sexo.trim().isEmpty()) {
-            return false;
-        }
-
+    static boolean esSexoValido(String sexo) {
+        if (sexo == null || sexo.trim().isEmpty()) return false;
         String sexoNormalizado = sexo.trim();
-
         for (String s : SEXOS_DISPONIBLES) {
-            if (s.equals(sexoNormalizado)) {
-                return true;
-            }
+            if (s.equals(sexoNormalizado)) return true;
         }
-
         return false;
     }
 
-    /**
-     * Retorna los sexos válidos disponibles.
-     * 
-     * @return Array de sexos válidos
-     */
-    public static String[] obtenerSexosDisponibles() {
+    static String[] obtenerSexosDisponibles() {
         return SEXOS_DISPONIBLES.clone();
     }
 
-    /**
-     * Retorna mensaje de error descriptivo para sexo inválido.
-     * 
-     * @return String con sexos válidos
-     */
-    public static String obtenerMensajeErrorSexo() {
-        return "Sexo inválido. Sexos válidos: " + 
-               String.join(", ", SEXOS_DISPONIBLES);
-    }
-    // ============ VALIDACIÓN DE TELÉFONO ============
-    
-    public static boolean esTelefonoValido(String telefono) {
-        if (telefono == null || telefono.trim().isEmpty()) {
-            return false;
-        }
-        
-        String digitosSolo = telefono.replaceAll("[^0-9]", "");
-        
-        return digitosSolo.length() >= LONGITUD_TELEFONO_MINIMA && 
-               digitosSolo.length() <= LONGITUD_TELEFONO_MAXIMA;
+    static String obtenerMensajeErrorSexo() {
+        return "Sexo inválido. Sexos válidos: " + String.join(", ", SEXOS_DISPONIBLES);
     }
     
-    public static String obtenerMensajeErrorTelefono(String telefono) {
-        if (telefono == null || telefono.trim().isEmpty()) {
-            return "El teléfono no puede estar vacío";
-        }
-        
+    static boolean esTelefonoValido(String telefono) {
+        if (telefono == null || telefono.trim().isEmpty()) return false;
         String digitosSolo = telefono.replaceAll("[^0-9]", "");
-        
-        if (digitosSolo.length() < LONGITUD_TELEFONO_MINIMA) {
-            return "El teléfono debe tener al menos " + LONGITUD_TELEFONO_MINIMA + 
-                   " dígitos. Ingresaste: " + digitosSolo.length();
-        }
-        
-        if (digitosSolo.length() > LONGITUD_TELEFONO_MAXIMA) {
-            return "El teléfono no debe exceder " + LONGITUD_TELEFONO_MAXIMA + 
-                   " dígitos. Ingresaste: " + digitosSolo.length();
-        }
-        
+        return digitosSolo.length() >= LONGITUD_TELEFONO_MINIMA && digitosSolo.length() <= LONGITUD_TELEFONO_MAXIMA;
+    }
+    
+    static String obtenerMensajeErrorTelefono(String telefono) {
+        if (telefono == null || telefono.trim().isEmpty()) return "El teléfono no puede estar vacío";
+        String digitosSolo = telefono.replaceAll("[^0-9]", "");
+        if (digitosSolo.length() < LONGITUD_TELEFONO_MINIMA) return "El teléfono debe tener al menos " + LONGITUD_TELEFONO_MINIMA + " dígitos.";
+        if (digitosSolo.length() > LONGITUD_TELEFONO_MAXIMA) return "El teléfono no debe exceder " + LONGITUD_TELEFONO_MAXIMA + " dígitos.";
         return "Formato de teléfono inválido";
     }
     
-    // ============ VALIDACIÓN DE NOMBRE ============
-    
-    public static boolean esNombreValido(String nombre) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            return false;
-        }
-        
+    static boolean esNombreValido(String nombre) {
+        if (nombre == null || nombre.trim().isEmpty()) return false;
         return nombre.trim().matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s\\-']+");
     }
     
-    public static String obtenerMensajeErrorNombre() {
-        return "El nombre contiene caracteres inválidos. " +
-               "Solo se permiten letras, espacios, guiones y apóstrofes.";
+    static String obtenerMensajeErrorNombre() {
+        return "El nombre contiene caracteres inválidos. Solo se permiten letras, espacios, guiones y apóstrofes.";
     }
     
-    // ============ VALIDACIÓN DE EDAD ============    
-    public static void validarEdad(int edad) throws EdadNoValidaException {
+    static void validarEdad(int edad) throws EdadNoValidaException {
         if (edad < 18 || edad > 65) {
             throw new EdadNoValidaException(edad);
         }

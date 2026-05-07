@@ -2,7 +2,7 @@ package entidades;
 
 import java.time.LocalDate;
 
-public class Extraccion {
+public class Extraccion implements procesamiento.Validadores {
     private Donante voluntario;
     private LocalDate fechaExtraccion;
     private int volumenExtraido;
@@ -26,4 +26,17 @@ public class Extraccion {
     public void setFechaExtraccion(LocalDate fechaExtraccion) { this.fechaExtraccion = fechaExtraccion; }
     public void setVolumenExtraido(int volumenExtraido) { this.volumenExtraido = volumenExtraido; }
     public void setSeSintioMal(boolean seSintioMal) { this.seSintioMal = seSintioMal; }
+    
+    //Metodos
+    @Override
+    public void validar() throws Exception {
+        // Una extraccion segura (no mayor a 600ml para evitar riesgos a la salud)
+        if (this.volumenExtraido <= 0 || this.volumenExtraido > 600) {
+            throw new Exception("Volumen inválido. Una extracción normal es entre 400ml y 500ml.");
+        }
+        // Que el donante de la extraccion exista
+        if (this.voluntario == null) {
+            throw new Exception("La extracción debe estar asociada a un donante válido.");
+        }
+    }
 }

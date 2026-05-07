@@ -5,7 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Campaña {
+public class Campaña implements procesamiento.Validadores {
     private String idCampaña; // nombreCampaña + fechaCampaña como identificador
     private String nombreCampaña;
     private String ubicacion;
@@ -39,5 +39,28 @@ public class Campaña {
     //Metodos
     public String obtenerResumen() {
         return this.idCampaña + " | Meta: " + this.metaDonaciones + "ml";
+    }
+
+    @Override
+    public void validar() throws Exception {
+        // Valida que la metaDonaciones sea positiva
+        if (this.metaDonaciones <= 0) {
+            throw new Exception("Error: La meta de donaciones debe ser mayor a 0 ml.");
+        }
+        
+        // Valida que el nombre no este en blanco
+        if (this.nombreCampaña == null || this.nombreCampaña.trim().isEmpty()) {
+            throw new Exception("Error: El nombre de la campaña no puede estar vacío.");
+        }
+        
+        // Valida que la ubicacion no este en blanco
+        if (this.ubicacion == null || this.ubicacion.trim().isEmpty()) {
+            throw new Exception("Error: La campaña debe tener una ubicación asignada.");
+        }
+        
+        // Valida que la fecha no este en blanco
+        if (this.fechaCampaña == null) {
+            throw new Exception("Error: La campaña debe tener una fecha programada.");
+        }
     }
 }

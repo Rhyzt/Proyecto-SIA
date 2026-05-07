@@ -60,6 +60,14 @@ public class GestionHistorial {
      * @return Un booleano que es true si se pudo agregar esta campaña y false si no (ya existia en el sistema)
      */
     public boolean agregarCampaña(Campaña c) {
+        // Validacion
+        try {
+            c.validar();
+        } catch (Exception e) {
+            System.err.println("Ingreso rechazado. Error en Campaña: " + e.getMessage());
+            return false;
+        }
+        
         if (historial.containsKey(c.getIdCampaña())) { // Se revisa si existia la campaña
             return false;
         }
@@ -135,6 +143,14 @@ public class GestionHistorial {
      * @return Un booleano que indica si la extraccion fue agregada o no (no existia la campaña)
      */
     public boolean registrarExtraccion(String idCampaña, Extraccion e) {
+        // Validacion
+        try {
+            e.validar();
+        } catch (Exception ex) {
+            System.err.println("Ingreso rechazado. Error en Extracción: " + ex.getMessage());
+            return false;
+        }
+        
         // Se asocia la extraccion con la campaña en el mapa
         if (!historial.containsKey(idCampaña)) return false;
         
@@ -240,6 +256,14 @@ public class GestionHistorial {
      * @return Un booleano que es true si se pudo agregar al donante y false si no (ya se encontraba en el mapa)
      */
     public boolean agregarDonante(Donante d) {
+        // Validacion del donante
+        try {
+            d.validar(); 
+        } catch (Exception e) {
+            System.err.println("Ingreso rechazado. Error en Donante: " + e.getMessage());
+            return false; // Rechazamos el ingreso al sistema
+        }
+        // Se revisa si ya se encuentra 
         if (voluntarios.containsKey(d.getRut()))
             return false;
         voluntarios.put(d.getRut(), d); 
@@ -465,7 +489,16 @@ public class GestionHistorial {
             metaDonaciones,
             grupoObjetivo, 
             porcentajeMeta
-        );  
+        );
+        
+        //Validacion
+        try {
+            nueva.validar();
+        } catch (Exception e) {
+            System.err.println("Creación rechazada. Error en Campaña Enfocada: " + e.getMessage());
+            return null; // Retornamos null porque falló
+        }
+        
         if(historial.containsKey(nueva.getIdCampaña())) return null;
         
         historial.put(nueva.getIdCampaña(), new ArrayList<>());
