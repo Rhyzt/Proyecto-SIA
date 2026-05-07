@@ -48,7 +48,10 @@ public class GestionHistorial {
     public Map<String, List<Extraccion>> obtenerCopiaHistorial() {
         return new HashMap<>(this.historial);
     }
-
+    
+    public Map<String, Integer> obtenerCopiaInventario() {
+        return inv.obtenerCopiaStock();
+    }
 
     //Metodos Campaña
     /**
@@ -110,6 +113,13 @@ public class GestionHistorial {
         return campañas.removeIf(c -> c.getIdCampaña().equals(idCampaña)); // Borra la campaña de la lista retorna true si existia y false si no
     }
     
+    public List<String> obtenerListaCampañas() {
+        List<String> listaResumenes = new ArrayList<>();
+        for (Campaña c : campañas) {
+            listaResumenes.add(c.obtenerResumen());
+        }
+        return listaResumenes;
+    }
     
     
     
@@ -330,6 +340,14 @@ public class GestionHistorial {
         }
     }
     
+    public List<String> obtenerListaVoluntarios() {
+        List<String> listaResumenes = new ArrayList<>();
+        for (Donante d : voluntarios.values()) {
+            listaResumenes.add(d.obtenerResumenReducido());
+        }
+        return listaResumenes;
+    }
+    
     
     
     
@@ -456,23 +474,22 @@ public class GestionHistorial {
 
 
 //Metodos varios
-    public List<String> obtenerListaCampañas() {
-        List<String> listaResumenes = new ArrayList<>();
-        for (Campaña c : campañas) {
-            listaResumenes.add(c.obtenerResumen());
-        }
-        return listaResumenes;
-    }
-    
-    public List<String> obtenerListaVoluntarios() {
-        List<String> listaResumenes = new ArrayList<>();
-        for (Donante d : voluntarios.values()) {
-            listaResumenes.add(d.obtenerResumenReducido());
-        }
-        return listaResumenes;
-    }
-    
     public List<String> obtenerResumenInventario() {
         return inv.obtenerEstadoInventario(); 
+    }
+    
+    public void agregarStockManual(String tipo, int cantidad) {
+        inv.registrarIngreso(tipo, cantidad);
+    }
+    
+    /**
+     * Puente para restar stock. Retorna true si fue exitoso, false si el tipo no existe.
+     */
+    public boolean restarStockManual(String tipo, int cantidad) {
+        return inv.restarStock(tipo, cantidad);
+    }
+    
+    public void cargarDatosInventario(Map<String, Integer> datos) {
+        inv.cargarDatos(datos);
     }
 }

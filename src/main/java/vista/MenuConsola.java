@@ -27,7 +27,7 @@ public class MenuConsola {
             System.out.println("1. Administrar Campañas");
             System.out.println("2. Administrar Donantes");
             System.out.println("3. Administrar Extracciones");
-            System.out.println("4. Ver Inventario");
+            System.out.println("4. Administrar Inventario");
             System.out.println("5. Llamado de Emergencia"); // Nueva opción visible
             System.out.println("6. Salir y Guardar");
             System.out.println("Seleccione una opción: ");
@@ -38,7 +38,7 @@ public class MenuConsola {
                     case 1: administrarCampañas(); break;
                     case 2: administrarDonantes(); break;
                     case 3: administrarExtracciones(); break;
-                    case 4: mostrarInventario(); break;
+                    case 4: administrarInventario(); break;
                     case 5: llamadoEmergencia(); break;
                     case 6: System.out.println("Guardando datos..."); break;
                     default: System.out.println("Opción no válida.");
@@ -138,6 +138,31 @@ public class MenuConsola {
         } while (subOp != 6);
     }
     
+    private void administrarInventario() {
+        int subOp = 0;
+        do {
+            System.out.println("\n--- ADMINISTRAR INVENTARIO ---");
+            System.out.println("1. Mostrar Inventario General");
+            System.out.println("2. Agregar Stock Manual");
+            System.out.println("3. Restar Stock Manual");
+            System.out.println("4. Volver");
+            System.out.println("Seleccione una opción: ");
+            
+            try {
+                subOp = Integer.parseInt(leer.nextLine());
+                switch(subOp) {
+                    case 1: mostrarInventario(); break;
+                    case 2: agregarStockManual(); break;
+                    case 3: restarStockManual(); break;
+                    case 4: break;
+                    default: System.out.println("Opción no válida.");
+                }
+            } catch (Exception e) {
+                System.out.println("Error: Ingrese un número válido.");
+            }
+        } while (subOp != 4);
+    }
+    
     // --- MÉTODOS DE REGISTRO ---
     private void registrarDonante() {
         try {
@@ -191,7 +216,23 @@ public class MenuConsola {
             System.out.println("Exito.");
         }
     }
-
+    
+    private void agregarStockManual() {
+        System.out.println("\n--- AGREGAR STOCK MANUAL ---");
+        try {
+            System.out.println("Ingrese Tipo de Sangre (ej: O+, A-): ");
+            String tipoSangre = leer.nextLine().trim().toUpperCase(); 
+            
+            System.out.println("Ingrese Volumen a agregar (en ml): ");
+            int cantidad = Integer.parseInt(leer.nextLine());
+            
+            sistema.agregarStockManual(tipoSangre, cantidad); 
+            System.out.println("Stock de sangre " + tipoSangre + " actualizado correctamente");
+        } catch (Exception e) {
+            System.out.println("Error: Asegúrese de ingresar un número entero para el volumen.");
+        }
+    }
+    
     // --- MÉTODOS DE BÚSQUEDA ---
     private void buscarDonante() {
         System.out.println("RUT: ");
@@ -379,6 +420,27 @@ public class MenuConsola {
             System.out.println("Donacion eliminada");
         } else {
             System.out.println("No se encontro la donacion..");
+        }
+    }
+    
+    private void restarStockManual() {
+        System.out.println("\n--- RESTAR STOCK MANUAL ---");
+        try {
+            System.out.println("Ingrese Tipo de Sangre a corregir (ej: O+, A-): ");
+            String tipoSangre = leer.nextLine().trim().toUpperCase(); 
+            
+            System.out.println("Ingrese Volumen a restar (en ml): ");
+            int cantidad = Integer.parseInt(leer.nextLine());
+            boolean exito = sistema.restarStockManual(tipoSangre, cantidad);
+            
+            if (exito) {
+                System.out.println("¡Stock de sangre " + tipoSangre + " reducido correctamente!");
+            } else {
+                System.out.println("Error: El tipo de sangre '" + tipoSangre + "' no existe en el inventario.");
+            }
+            
+        } catch (Exception e) {
+            System.out.println("Error: Asegúrese de ingresar un número entero para el volumen.");
         }
     }
     

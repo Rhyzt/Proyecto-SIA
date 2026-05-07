@@ -14,9 +14,9 @@ public class VentanaPrincipal extends JFrame {
 
     public VentanaPrincipal(GestionHistorial sistema) {
         this.sistema = sistema;
-        setTitle("SIA 2026 - Gestión de Donaciones de Sangre");
+        setTitle("Gestión de Donaciones de Sangre");
         setSize(450, 500);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panelPrincipal = new JPanel();
@@ -32,7 +32,8 @@ public class VentanaPrincipal extends JFrame {
         JButton btnRegDonante = new JButton("Registrar Nuevo Donante");
         JButton btnRegCampana = new JButton("Crear Nueva Campaña");
         JButton btnRegExtraccion = new JButton("Registrar Donación (Extracción)");
-
+        JButton btnAgregarStockManual = new JButton("Agregar Stock Manual");
+        
 
         JButton btnBusDonante = new JButton("Buscar Donante (RUT)");
         JButton btnBusCampana = new JButton("Buscar Campaña (ID)");
@@ -47,7 +48,7 @@ public class VentanaPrincipal extends JFrame {
         JButton btnEliDonante = new JButton("Eliminar Donante (Y su historial)");
         JButton btnEliCampana = new JButton("Eliminar Campaña (Y su stock)");
         JButton btnEliExtraccion = new JButton("Eliminar Extraccion");
-
+        JButton btnRestarStockManual = new JButton("Restar/Corregir Stock");
 
         JButton btnListDonantes = new JButton("Listar Todos los Donantes");
         JButton btnListCampanas = new JButton("Listar Todas las Campañas");
@@ -130,16 +131,69 @@ public class VentanaPrincipal extends JFrame {
         });
         
         btnInventario.addActionListener(e -> {
-            StringBuilder sb = new StringBuilder("--- INVENTARIO ---\n");
-            java.util.List<String> inventarioResumen = sistema.obtenerResumenInventario();
-            if (inventarioResumen.isEmpty()) {
-                sb.append("No hay extracciones registradas en el sistema.\n");
-            } else {
-                for (String resumen : inventarioResumen) {
-                    sb.append(resumen).append("\n");
+            String[] opciones = {"Ver Estado General", "Agregar Stock (+)", "Corregir Stock (-)"};
+            
+            int seleccion = JOptionPane.showOptionDialog(
+                    this,
+                    "Seleccione la acción que desea realizar en el Banco de Sangre:",
+                    "Gestión de Inventario",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null, 
+                    opciones, 
+                    opciones[0]
+            );
+
+            if (seleccion == 0) {
+                // OPCIÓN 1: Mostrar Inventario
+                StringBuilder sb = new StringBuilder("--- INVENTARIO DE SANGRE ---\n\n");
+                java.util.List<String> inventarioResumen = sistema.obtenerResumenInventario();
+                
+                if (inventarioResumen.isEmpty()) {
+                    sb.append("No hay stock registrado en el sistema.\n");
+                } else {
+                    for (String resumen : inventarioResumen) {
+                        sb.append(resumen).append("\n");
+                    }
                 }
-            } 
-            JOptionPane.showMessageDialog(this, sb.toString());
+                mostrarScroll(sb.toString(), "Estado del Inventario");
+                
+            } else if (seleccion == 1) {
+                // OPCIÓN 2: Agregar Stock Manual
+                String tipo = JOptionPane.showInputDialog(this, "Ingrese Tipo de Sangre (ej: O+, A-):", "Ingreso Manual", JOptionPane.QUESTION_MESSAGE);
+                if (tipo != null && !tipo.trim().isEmpty()) {
+                    String cantStr = JOptionPane.showInputDialog(this, "Volumen en ml a ingresar:");
+                    if (cantStr != null) {
+                        try {
+                            int cantidad = Integer.parseInt(cantStr);
+                            sistema.agregarStockManual(tipo.trim().toUpperCase(), cantidad);
+                            JOptionPane.showMessageDialog(this, "Stock de " + tipo.toUpperCase() + " actualizado exitosamente.");
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(this, "Error: Ingrese un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+                
+            } else if (seleccion == 2) {
+                // OPCIÓN 3: Restar / Corregir Stock
+                String tipo = JOptionPane.showInputDialog(this, "Ingrese Tipo de Sangre a corregir:", "Restar Stock", JOptionPane.WARNING_MESSAGE);
+                if (tipo != null && !tipo.trim().isEmpty()) {
+                    String cantStr = JOptionPane.showInputDialog(this, "Cantidad de ml a descontar:");
+                    if (cantStr != null) {
+                        try {
+                            int cantidad = Integer.parseInt(cantStr);
+                            boolean exito = sistema.restarStockManual(tipo.trim().toUpperCase(), cantidad);
+                            if (exito) {
+                                JOptionPane.showMessageDialog(this, "Stock corregido correctamente.");
+                            } else {
+                                JOptionPane.showMessageDialog(this, "Error: El tipo '" + tipo.toUpperCase() + "' no existe en el sistema.", "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(this, "Error: Ingrese un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                }
+            }
         });
 
         // REGISTROS
@@ -190,7 +244,29 @@ public class VentanaPrincipal extends JFrame {
                 JOptionPane.showMessageDialog(this, "Campaña o Donante no existen.");
             }
         });
+        
+        btnAgregarStockManual.addActionListener(e -> {
+            String tipo = JOptionPane.showInputDialog(this, 
+                "Ingrese Tipo de Sangre (ej: O+, A-):", 
+                "Ingreso Manual",
+                JOptionPane.QUESTION_MESSAGE);
 
+            if (tipo != null && !tipo.trim().isEmpty()) {
+                String cantStr = JOptionPane.showInputDialog(this, "Volumen en ml a ingresar:");
+                if (cantStr != null) {
+                    try {
+                        int cantidad = Integer.parseInt(cantStr);
+
+                        sistema.agregarStockManual(tipo.trim().toUpperCase(), cantidad);
+
+                        JOptionPane.showMessageDialog(this, "Stock actualizado exitosamente.");
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Error: Ingrese un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        
         // BÚSQUEDAS
         btnBusDonante.addActionListener(e -> {
             String rut = JOptionPane.showInputDialog("Ingrese RUT a buscar:");
@@ -339,7 +415,32 @@ public class VentanaPrincipal extends JFrame {
                 JOptionPane.showMessageDialog(this, "No se encontró la extracción.");
             }
         });
+        
+        btnRestarStockManual.addActionListener(e -> {
+            String tipo = JOptionPane.showInputDialog(this, 
+                "Ingrese Tipo de Sangre a corregir:", 
+                "Restar Stock Manual", 
+                JOptionPane.WARNING_MESSAGE);
 
+            if (tipo != null && !tipo.trim().isEmpty()) {
+                String cantStr = JOptionPane.showInputDialog(this, "Cantidad de ml a descontar:");
+                if (cantStr != null) {
+                    try {
+                        int cantidad = Integer.parseInt(cantStr);
+                        boolean exito = sistema.restarStockManual(tipo.trim().toUpperCase(), cantidad);
+
+                        if (exito) {
+                            JOptionPane.showMessageDialog(this, "Stock corregido correctamente.");
+                        } else {
+                            JOptionPane.showMessageDialog(this, "Error: El tipo '" + tipo + "' no se encuentra en el sistema.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(this, "Error: Ingrese un número válido.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+            }
+        });
+        
         // LISTADOS
         btnListDonantes.addActionListener(e -> {
             StringBuilder sb = new StringBuilder("--- DONANTES REGISTRADOS ---\n");
@@ -390,7 +491,11 @@ public class VentanaPrincipal extends JFrame {
             }
         });
 
-        btnSalir.addActionListener(e -> dispose());
+        btnSalir.addActionListener(e -> {
+            System.out.println("Guardando cambios en archivos...");
+            archivos.ArchivoUtil.guardarTodo(sistema);
+            System.exit(0);
+        });
 
         // AGREGAR BOTONES AL PANEL
         panelPrincipal.add(btnCampanas);
@@ -400,6 +505,16 @@ public class VentanaPrincipal extends JFrame {
         panelPrincipal.add(btnSalir);
 
         add(new JScrollPane(panelPrincipal));
+    
+        
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                System.out.println("Cerrando ventana: Guardando cambios en archivos...");
+                archivos.ArchivoUtil.guardarTodo(sistema); 
+                System.exit(0);
+            }
+        });
     }
 
     private void mostrarScroll(String texto, String titulo) {
@@ -409,4 +524,6 @@ public class VentanaPrincipal extends JFrame {
         scroll.setPreferredSize(new Dimension(400, 300));
         JOptionPane.showMessageDialog(this, scroll, titulo, JOptionPane.PLAIN_MESSAGE);
     }
+
+    
 }

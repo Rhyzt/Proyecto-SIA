@@ -1,4 +1,4 @@
-    package procesamiento;
+package procesamiento;
 
 import entidades.Donante;
 import entidades.Extraccion;
@@ -15,6 +15,11 @@ public class Inventario {
         stockSangre = new TreeMap<>();
     }
 
+   //Getters para copias
+    public Map<String, Integer> obtenerCopiaStock() {
+        return new TreeMap<>(this.stockSangre);
+    }
+    
     /**
      * Registra el ingreso de sangre al stock tras una extracción.
      */
@@ -71,9 +76,14 @@ public class Inventario {
     }
     
     //Metodos varios
-        public List<String> obtenerEstadoInventario() {
+    public List<String> obtenerEstadoInventario() {
         List<String> estadoInv = new ArrayList<>();
         stockSangre.forEach((k, v) -> estadoInv.add(k + ": " + v + "ml"));
         return estadoInv;
+    }
+
+    public void cargarDatos(Map<String, Integer> datosCargados) {
+        this.stockSangre.clear();
+        this.stockSangre.putAll(datosCargados);
     }
 }

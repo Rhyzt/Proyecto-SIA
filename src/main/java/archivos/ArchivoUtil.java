@@ -14,14 +14,17 @@ public class ArchivoUtil {
     private static final String FILE_CAMPANAS = "csv/campañas.csv";
     private static final String FILE_DONANTES = "csv/donantes.csv";
     private static final String FILE_EXTRACCIONES = "csv/extracciones.csv";
+    private static final String FILE_INVENTARIO = "csv/inventario.csv";
     private static final DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     public static void cargarTodo(GestionHistorial sistema) {
         cargarDonantes(sistema);
         cargarCampanas(sistema);
         cargarExtracciones(sistema);
+        cargarInventario(sistema);
     }
 
+    
     private static void cargarDonantes(GestionHistorial sistema) {
         File f = new File(FILE_DONANTES);
         if (!f.exists()) return;
@@ -84,10 +87,28 @@ public class ArchivoUtil {
         } catch (Exception e) { System.err.println("Error extracciones: " + e.getMessage()); }
     }
 
+    private static void cargarInventario(GestionHistorial sistema) {
+        File f = new File(FILE_INVENTARIO);
+        if (!f.exists()) return;
+        Map<String, Integer> stockCargado = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                String[] d = linea.split(",");
+                if (d.length == 2) {
+                    stockCargado.put(d[0], Integer.parseInt(d[1]));
+                }
+            }
+            sistema.cargarDatosInventario(stockCargado);
+        } catch (Exception e) { System.err.println("Error inventario: " + e.getMessage()); }
+    }
+    
+    
     public static void guardarTodo(GestionHistorial sistema) {
         guardarDonantes(sistema.obtenerCopiaVoluntarios());
         guardarCampanas(sistema.obtenerCopiaCampañas());
         guardarExtracciones(sistema.obtenerCopiaHistorial());
+        guardarInventario(sistema.obtenerCopiaInventario());
     }
 
     private static void guardarDonantes(Map<String, Donante> voluntarios) {
@@ -126,5 +147,13 @@ public class ArchivoUtil {
                 }
             }
         } catch (IOException e) { System.err.println("Error guardando extracciones: " + e.getMessage()); }
+    }
+
+    private static void guardarInventario(Map<String, Integer> stock) {
+        try (PrintWriter pw = new PrintWriter(new FileWriter(FILE_INVENTARIO))) {
+            for (Map.Entry<String, Integer> entrada : stock.entrySet()) {
+                pw.println(entrada.getKey() + "," + entrada.getValue());
+            }
+        } catch (IOException e) { System.err.println("Error guardando inventario: " + e.getMessage()); }
     }
 }
