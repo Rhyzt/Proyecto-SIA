@@ -27,7 +27,7 @@ public class VentanaPrincipal extends JFrame {
         JButton btnCampanas = new JButton("Administrar Campañas");
         JButton btnDonantes = new JButton("Administrar Donantes");
         JButton btnExtracciones = new JButton("Administrar Extracciones");
-        JButton btnInventario = new JButton("Ver Inventario General");
+        JButton btnInventario = new JButton("Administrar Inventario");
         JButton btnEmergencia = new JButton(" Generar Llamado de Emergencia");
         JButton btnSalir = new JButton("Salir y Guardar");
         
@@ -197,11 +197,6 @@ public class VentanaPrincipal extends JFrame {
                 }
             }
         });
-        btnInventario.addActionListener(e -> {
-            java.util.List<String> estado = sistema.obtenerResumenInventario();
-            mostrarScroll(String.join("\n", estado), "Estado del Inventario");
-        });
-
 
         btnSalir.addActionListener(e -> {
             archivos.ArchivoUtil.guardarTodo(sistema);
@@ -238,9 +233,13 @@ public class VentanaPrincipal extends JFrame {
             String nom = JOptionPane.showInputDialog("Nombre Campaña:");
             String ubi = JOptionPane.showInputDialog("Ubicación:");
             String fec = JOptionPane.showInputDialog("Fecha (dd/mm/yyyy):");
-            int meta = Integer.parseInt(JOptionPane.showInputDialog("Meta (ml):"));
-            if(sistema.agregarCampaña(new Campaña(nom, ubi, fec, meta)))
-                JOptionPane.showMessageDialog(this, "Campaña creada.");
+            String meta = JOptionPane.showInputDialog("Meta (ml):");
+            if (nom != null && ubi != null && fec != null) {
+                int metaParseada = Integer.parseInt(meta);
+                Campaña nuevaCampaña = new Campaña(nom, ubi, fec, metaParseada);
+                if(sistema.agregarCampaña(nuevaCampaña))
+                    JOptionPane.showMessageDialog(this, "Campaña creada.");
+            }
         });
 
         btnRegExtraccion.addActionListener(e -> {
@@ -249,11 +248,31 @@ public class VentanaPrincipal extends JFrame {
             Campaña c = sistema.buscarCampaña(idC);
             Donante d = sistema.buscarDonante(rutD);
             if (c != null && d != null) {
-                int vol = Integer.parseInt(JOptionPane.showInputDialog("Volumen (ml):"));
-                sistema.registrarExtraccion(idC, new Extraccion(d, c.getFechaCampaña(), vol, false));
-                JOptionPane.showMessageDialog(this, "Extracción registrada exitosamente.");
+                try {
+                    // Se revisa si es apto para donar primero, si no, arroja FrecuenciaDonacionException
+                    d.esAptoParaDonar(c.getFechaCampaña());
+
+                    // Si es apto, se piden los demas datos
+                    String volStr = JOptionPane.showInputDialog(this, "Volumen (ml):");
+                    if (volStr != null) {
+                        int vol = Integer.parseInt(volStr);
+
+                        sistema.registrarExtraccion(idC, new entidades.Extraccion(d, c.getFechaCampaña(), vol, false));
+                        JOptionPane.showMessageDialog(this, "Extracción registrada exitosamente.");
+                    }
+
+                } catch (exceptions.FrecuenciaDonacionException ex) {
+                    // Si la excepcion ocurre, se muestra en consola 
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Donación Rechazada", JOptionPane.WARNING_MESSAGE);
+
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Error: El volumen debe ser un número entero.", "Error de Formato", JOptionPane.ERROR_MESSAGE);
+
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(this, "Error de validación: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                }
             } else {
-                JOptionPane.showMessageDialog(this, "Campaña o Donante no existen.");
+                JOptionPane.showMessageDialog(this, "Campaña o Donante no existen.", "No encontrado", JOptionPane.ERROR_MESSAGE);
             }
         });
         

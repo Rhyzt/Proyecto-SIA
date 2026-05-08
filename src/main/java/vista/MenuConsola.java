@@ -173,7 +173,7 @@ public class MenuConsola {
             System.out.println("RUT: "); 
             String r = leer.nextLine();
 
-            System.out.println("Edad: "); 
+            System.out.println("Edad: ");
             int e = Integer.parseInt(leer.nextLine());
             
             Validadores.validarEdad(e); 
@@ -211,10 +211,28 @@ public class MenuConsola {
         Campaña c = sistema.buscarCampaña(id);
         Donante d = sistema.buscarDonante(rut);
         if (c != null && d != null) {
-            System.out.println("Volumen (ml): ");
-            int v = Integer.parseInt(leer.nextLine());
-            sistema.registrarExtraccion(id, new Extraccion(d, c.getFechaCampaña(), v, false));
-            System.out.println("Exito.");
+           try {
+                // Se revisa si es apto para donar primero, si no, arroja FrecuenciaDonacionException
+                d.esAptoParaDonar(c.getFechaCampaña());
+                
+                // Si es apto, se piden los demas datos
+                System.out.println("Volumen (ml): ");
+                int v = Integer.parseInt(leer.nextLine());
+                
+                sistema.registrarExtraccion(id, new Extraccion(d, c.getFechaCampaña(), v, false));
+                System.out.println("Exito: Extracción registrada correctamente.");
+                
+            } catch (exceptions.FrecuenciaDonacionException ex) {
+                // Si la excepcion ocurre, se muestra en consola
+                System.out.println("Donación rechazada: " + ex.getMessage());
+                
+            } catch (NumberFormatException ex) {
+                System.out.println("Error: El volumen debe ser un numero entero.");
+            } catch (Exception ex) {
+                System.out.println("Error de validacion: " + ex.getMessage());
+            }
+        } else {
+            System.out.println("Error: La campaña o el donante no existen en el sistema.");
         }
     }
     
