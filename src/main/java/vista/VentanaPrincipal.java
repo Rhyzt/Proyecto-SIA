@@ -207,7 +207,6 @@ public class VentanaPrincipal extends JFrame {
             archivos.ArchivoUtil.guardarTodo(sistema);
             System.exit(0);
         });
-        btnEmergencia.addActionListener(e -> ejecutarLlamadoEmergencia());
 
         // REGISTROS
         btnRegDonante.addActionListener(e -> {
@@ -279,7 +278,6 @@ public class VentanaPrincipal extends JFrame {
                 }
             }
         });
-        btnEmergencia.addActionListener(e -> ejecutarLlamadoEmergencia());
         
         // BÚSQUEDAS
         btnBusDonante.addActionListener(e -> {
@@ -569,18 +567,50 @@ public class VentanaPrincipal extends JFrame {
         int r = JOptionPane.showConfirmDialog(this, "¿Desea crear una Campaña Enfocada?", "Sugerencia", JOptionPane.YES_NO_OPTION);
         if (r != JOptionPane.YES_OPTION) return;
 
-        JTextField nombre = new JTextField();
-        JTextField meta = new JTextField("5000");
-        Object[] mensaje = {"Nombre:", nombre, "Meta (ml):", meta, "Tipo:", new JLabel(tipo)};
-
+        String nombreCampaña = "(" + tipo + ")Emergencia";
+        String sede = "SinSede";
+        JTextField meta = new JTextField("10000");
+        JTextField fecha = new JTextField("DD/MM/YYYY");
+        JTextField porcentaje = new JTextField("50");
+        
+        Object[] mensaje = {
+            "Configuración de Campaña de Emergencia",
+            "Nombre por defecto: " + nombreCampaña,
+            "-----------------------------",
+            "Meta (en ml):", meta, 
+            "Ingrese la fecha de la campaña (dd/mm/yyyy):", fecha,
+            "Ingrese el porcentaje objetivo del grupo (0 a 100):", porcentaje
+        };
+                
         int opcion = JOptionPane.showConfirmDialog(this, mensaje, "Nueva Campaña", JOptionPane.OK_CANCEL_OPTION);
         if (opcion == JOptionPane.OK_OPTION) {
             try {
-                sistema.crearCampañaEnfocada(nombre.getText(), "Sede Central", "15/05/2026",
-                        Integer.parseInt(meta.getText()), tipo, 50.0f);
-                JOptionPane.showMessageDialog(this, "Campaña creada.");
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error en los datos.");
+                // Convertimos el porcentaje igual que en consola
+                float porcentajeMeta = Float.parseFloat(porcentaje.getText().trim()) / 100f;
+                
+                // Convetir la meta a un int
+                String textoExtraido = meta.getText().trim();
+                int metaValor = Integer.parseInt(textoExtraido);
+                
+                // Llamamos al sistema
+                entidades.CampañaEnfocada nueva = sistema.crearCampañaEnfocada(
+                        nombreCampaña, 
+                        sede, 
+                        fecha.getText().trim(), 
+                        metaValor,
+                        tipo, 
+                        porcentajeMeta
+                );
+                
+                // Mismos mensajes de éxito/error que en consola
+                if (nueva != null) {
+                    JOptionPane.showMessageDialog(this, "Exito: Se ha creado la campaña con ID:\n" + nueva.getIdCampaña());
+                } else {
+                    JOptionPane.showMessageDialog(this, "Error: Ya existe una campaña con ese ID automatico.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
+                
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Error: El porcentaje debe ser numérico.", "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }

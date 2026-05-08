@@ -471,16 +471,8 @@ public class GestionHistorial {
             return false;
         }
     }
-    /**
-     * 
-     * @param nombreCampaña
-     * @param ubicacion
-     * @param fechaCampaña
-     * @param metaDonaciones
-     * @param grupoObjetivo
-     * @param porcentajeMeta
-     * @return 
-     */
+
+    
     public CampañaEnfocada crearCampañaEnfocada(String nombreCampaña, String ubicacion, String fechaCampaña, int metaDonaciones, String grupoObjetivo, float porcentajeMeta) {
         CampañaEnfocada nueva = new CampañaEnfocada(
             nombreCampaña,
@@ -496,7 +488,7 @@ public class GestionHistorial {
             nueva.validar();
         } catch (Exception e) {
             System.err.println("Creación rechazada. Error en Campaña Enfocada: " + e.getMessage());
-            return null; // Retornamos null porque falló
+            return null;
         }
         
         if(historial.containsKey(nueva.getIdCampaña())) return null;
