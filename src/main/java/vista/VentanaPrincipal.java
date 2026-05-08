@@ -16,18 +16,19 @@ public class VentanaPrincipal extends JFrame {
     public VentanaPrincipal(GestionHistorial sistema) {
         this.sistema = sistema;
         setTitle("Gestión de Donaciones de Sangre");
-        setSize(450, 500);
+        setSize(450, 600);
         setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         setLocationRelativeTo(null);
 
         JPanel panelPrincipal = new JPanel();
-        panelPrincipal.setLayout(new GridLayout(5, 1, 5, 10));
+        panelPrincipal.setLayout(new GridLayout(0, 1, 5, 10));
         panelPrincipal.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
 
         JButton btnCampanas = new JButton("Administrar Campañas");
         JButton btnDonantes = new JButton("Administrar Donantes");
         JButton btnExtracciones = new JButton("Administrar Extracciones");
         JButton btnInventario = new JButton("Ver Inventario General");
+        JButton btnEmergencia = new JButton(" Generar Llamado de Emergencia");
         JButton btnSalir = new JButton("Salir y Guardar");
         
         JButton btnRegDonante = new JButton("Registrar Nuevo Donante");
@@ -196,6 +197,17 @@ public class VentanaPrincipal extends JFrame {
                 }
             }
         });
+        btnInventario.addActionListener(e -> {
+            java.util.List<String> estado = sistema.obtenerResumenInventario();
+            mostrarScroll(String.join("\n", estado), "Estado del Inventario");
+        });
+
+
+        btnSalir.addActionListener(e -> {
+            archivos.ArchivoUtil.guardarTodo(sistema);
+            System.exit(0);
+        });
+        btnEmergencia.addActionListener(e -> ejecutarLlamadoEmergencia());
 
         // REGISTROS
         btnRegDonante.addActionListener(e -> {
@@ -267,6 +279,7 @@ public class VentanaPrincipal extends JFrame {
                 }
             }
         });
+        btnEmergencia.addActionListener(e -> ejecutarLlamadoEmergencia());
         
         // BÚSQUEDAS
         btnBusDonante.addActionListener(e -> {
@@ -497,12 +510,14 @@ public class VentanaPrincipal extends JFrame {
             archivos.ArchivoUtil.guardarTodo(sistema);
             System.exit(0);
         });
+        btnEmergencia.addActionListener(e -> ejecutarLlamadoEmergencia());
 
         // AGREGAR BOTONES AL PANEL
         panelPrincipal.add(btnCampanas);
         panelPrincipal.add(btnDonantes);
         panelPrincipal.add(btnExtracciones);
         panelPrincipal.add(btnInventario);
+        panelPrincipal.add(btnEmergencia);
         panelPrincipal.add(btnSalir);
 
         add(new JScrollPane(panelPrincipal));
@@ -526,5 +541,49 @@ public class VentanaPrincipal extends JFrame {
         JOptionPane.showMessageDialog(this, scroll, titulo, JOptionPane.PLAIN_MESSAGE);
     }
 
-    
+    private void ejecutarLlamadoEmergencia() {
+        String tipo = JOptionPane.showInputDialog(this, "Ingrese el tipo de sangre requerido:");
+        if (tipo == null || tipo.trim().isEmpty()) return;
+
+        tipo = tipo.toUpperCase().trim();
+        java.util.List<entidades.Donante> aptos = sistema.filtroTipoAntiguedad(tipo);
+
+        if (aptos.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "No hay donantes aptos para " + tipo);
+            return;
+        }
+
+        int confirmar = JOptionPane.showConfirmDialog(this,
+                "Se encontraron " + aptos.size() + " donantes. ¿Exportar lista?",
+                "Emergencia", JOptionPane.YES_NO_OPTION);
+
+        if (confirmar == JOptionPane.YES_OPTION) {
+            if (sistema.exportarListaAptos(aptos, "emergencia_" + tipo + ".txt")) {
+                JOptionPane.showMessageDialog(this, "Archivo generado.");
+                ofrecerCrearCampanaEnfocada(tipo);
+            }
+        }
+    }
+
+    private void ofrecerCrearCampanaEnfocada(String tipo) {
+        int r = JOptionPane.showConfirmDialog(this, "¿Desea crear una Campaña Enfocada?", "Sugerencia", JOptionPane.YES_NO_OPTION);
+        if (r != JOptionPane.YES_OPTION) return;
+
+        JTextField nombre = new JTextField();
+        JTextField meta = new JTextField("5000");
+        Object[] mensaje = {"Nombre:", nombre, "Meta (ml):", meta, "Tipo:", new JLabel(tipo)};
+
+        int opcion = JOptionPane.showConfirmDialog(this, mensaje, "Nueva Campaña", JOptionPane.OK_CANCEL_OPTION);
+        if (opcion == JOptionPane.OK_OPTION) {
+            try {
+                sistema.crearCampañaEnfocada(nombre.getText(), "Sede Central", "15/05/2026",
+                        Integer.parseInt(meta.getText()), tipo, 50.0f);
+                JOptionPane.showMessageDialog(this, "Campaña creada.");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error en los datos.");
+            }
+        }
+    }
 }
+
+    
