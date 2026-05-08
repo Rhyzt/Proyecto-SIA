@@ -176,40 +176,76 @@ public class MenuConsola {
             System.out.println("Edad: ");
             int e = Integer.parseInt(leer.nextLine());
             
-            Validadores.validarEdad(e); 
+            System.out.println("Sexo: "); 
+            String s = leer.nextLine();
 
             System.out.println("Tipo Sangre: "); 
             String t = leer.nextLine();
+            
+            System.out.println("Fecha ultima donacion (formato DD/MM/AAAA): "); 
+            String f = leer.nextLine();
 
             System.out.println("Teléfono: "); 
             String tel = leer.nextLine();
 
-            Donante d = new Donante(n, r, e, "M", t, "01/01/2000", tel);
-
+            Donante d = new Donante(n, r, e, s, t, f, tel);
+            d.validar();
             if (sistema.agregarDonante(d)) {
                 System.out.println("Donante registrado.");
+            } else {
+                System.out.println("Error: Ya existe un donante registrado con ese RUT.");
             }
 
         } catch (EdadNoValidaException ex) {
             System.out.println(ex.getMessage());
         } catch (NumberFormatException ex) {
             System.out.println("Debe ingresar un número válido para la edad.");
-        }
+        } catch (java.time.format.DateTimeParseException ex) {
+            System.out.println("Error de formato: La fecha debe cumplir el formato DD/MM/AAAA.");
+        } catch (Exception ex) {
+            System.out.println(ex.getMessage());
+        } 
     }
 
     private void registrarCampana() {
-        System.out.println("Nombre: "); String n = leer.nextLine();
-        System.out.println("Ubicación: "); String u = leer.nextLine();
-        System.out.println("Fecha: "); String f = leer.nextLine();
-        System.out.println("Meta (ml): "); int m = Integer.parseInt(leer.nextLine());
-        if (sistema.agregarCampaña(new Campaña(n, u, f, m))) System.out.println("Campaña creada.");
+        try {
+            System.out.println("Nombre: "); 
+            String n = leer.nextLine();
+            
+            System.out.println("Ubicación: "); 
+            String u = leer.nextLine();
+            
+            System.out.println("Fecha (formato DD/MM/AAAA): "); 
+            String f = leer.nextLine();
+            
+            System.out.println("Meta (ml): "); 
+            int m = Integer.parseInt(leer.nextLine()); 
+            
+            Campaña c = new Campaña(n, u, f, m);
+            c.validar(); 
+            
+            if (sistema.agregarCampaña(c)) {
+                System.out.println("Campaña creada exitosamente.");
+            } else {
+                System.out.println("Error: Ya existe una campaña registrada con ese ID en esta fecha.");
+            }
+            
+        } catch (NumberFormatException ex) {
+            System.out.println("Error de formato: La meta de donaciones debe ser un número entero (ej: 10000).");
+        } catch (java.time.format.DateTimeParseException ex) {
+            System.out.println("Error de formato: La fecha debe cumplir el formato DD/MM/AAAA.");
+        } catch (Exception ex) {
+            System.out.println("Error de validación: " + ex.getMessage());
+        }
     }
     
     private void registrarExtraccion() {
         System.out.println("ID Campaña: "); String id = leer.nextLine();
         System.out.println("RUT Donante: "); String rut = leer.nextLine();
+        
         Campaña c = sistema.buscarCampaña(id);
         Donante d = sistema.buscarDonante(rut);
+        
         if (c != null && d != null) {
            try {
                 // Se revisa si es apto para donar primero, si no, arroja FrecuenciaDonacionException
@@ -219,11 +255,15 @@ public class MenuConsola {
                 System.out.println("Volumen (ml): ");
                 int v = Integer.parseInt(leer.nextLine());
                 
-                sistema.registrarExtraccion(id, new Extraccion(d, c.getFechaCampaña(), v, false));
-                System.out.println("Exito: Extracción registrada correctamente.");
+                Extraccion nuevaExtraccion = new Extraccion(d, c.getFechaCampaña(), v, false);
+                nuevaExtraccion.validar(); 
                 
+                if (sistema.registrarExtraccion(id, nuevaExtraccion)) {
+                    System.out.println("Exito: Extracción registrada correctamente.");
+                } else {
+                    System.out.println("Error: Este donante ya tiene una extracción registrada en esta campaña.");
+                }
             } catch (exceptions.FrecuenciaDonacionException ex) {
-                // Si la excepcion ocurre, se muestra en consola
                 System.out.println("Donación rechazada: " + ex.getMessage());
                 
             } catch (NumberFormatException ex) {
@@ -599,7 +639,7 @@ public class MenuConsola {
                 crearCampanaEnfocada(tipo);
             }
         } else {
-            System.out.println("❌ Error al exportar el archivo.");
+            System.out.println("Error al exportar el archivo.");
         }
     }
     

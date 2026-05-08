@@ -29,14 +29,12 @@ public interface Validadores {
     static String obtenerMensajeErrorRUT(String rut) {
         if (rut == null || rut.trim().isEmpty()) return "El RUT no puede estar vacío";
         
-        // 1 y 2. CORRECCIÓN: Mismo regex del validador y agregamos toUpperCase()
         String rutLimpio = rut.replaceAll("[\\-\\.\\s]", "").trim().toUpperCase();
         
         if (rutLimpio.length() < LONGITUD_RUT_MINIMA) {
             return "El RUT debe tener al menos " + LONGITUD_RUT_MINIMA + " caracteres.";
         }
         
-        // 3. CORRECCIÓN: Misma validación estricta que arriba
         if (!rutLimpio.matches("^[0-9]+[0-9K]$")) {
             return "El RUT debe contener solo números (y opcionalmente K al final).";
         }

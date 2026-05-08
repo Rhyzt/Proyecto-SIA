@@ -38,11 +38,8 @@ public class Inventario {
      */
     public void registrarIngreso(String tipoDeseado, int volumen) {
         String tipoForm = tipoDeseado.toUpperCase().trim();
-        if (stockSangre.containsKey(tipoForm)) {
-            int volumenActual = stockSangre.get(tipoForm);
-            // Evita que el stock sea negativo
-            stockSangre.put(tipoForm, Math.max(0, volumenActual + volumen));
-        }
+        int volumenActual = stockSangre.getOrDefault(tipoForm, 0);
+        stockSangre.put(tipoForm, Math.max(0, volumenActual + volumen));
     }
 
     /**
