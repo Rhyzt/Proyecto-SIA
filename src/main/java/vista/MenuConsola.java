@@ -242,9 +242,10 @@ public class MenuConsola {
     private void registrarExtraccion() {
         System.out.println("ID Campaña: "); String id = leer.nextLine();
         System.out.println("RUT Donante: "); String rut = leer.nextLine();
+        String rutFormateado = procesamiento.Validadores.formatearRut(rut);
         
         Campaña c = sistema.buscarCampaña(id);
-        Donante d = sistema.buscarDonante(rut);
+        Donante d = sistema.buscarDonante(rutFormateado);
         
         if (c != null && d != null) {
            try {
@@ -295,7 +296,9 @@ public class MenuConsola {
     // --- MÉTODOS DE BÚSQUEDA ---
     private void buscarDonante() {
         System.out.println("RUT: ");
-        Donante d = sistema.buscarDonante(leer.nextLine());
+        String rut = leer.nextLine();
+        String rutFormateado = procesamiento.Validadores.formatearRut(rut);
+        Donante d = sistema.buscarDonante(rutFormateado);
         if (d != null) d.obtenerResumen();
         else System.out.println("No encontrado.");
     }
@@ -338,9 +341,10 @@ public class MenuConsola {
     // --- METODOS DE EDICIÓN ---   
     private void editarDonante() {
         System.out.println("RUT del donante a editar: ");
-        String r = leer.nextLine();
+        String rut = leer.nextLine();
+        String rutFormateado = procesamiento.Validadores.formatearRut(rut);
         
-        Donante d = sistema.buscarDonante(r);
+        Donante d = sistema.buscarDonante(rutFormateado);
 
         if (d != null) {
             System.out.println("--- Presione Enter para mantener el valor actual ---");
@@ -370,7 +374,7 @@ public class MenuConsola {
             String tel = leer.nextLine();
             if (tel.isEmpty()) tel = d.getTelefono();
 
-            if (sistema.actualizarDonante(r, n, e, s, ts, tel)) {
+            if (sistema.actualizarDonante(rutFormateado, n, e, s, ts, tel)) {
                 System.out.println("Datos del donante actualizados.");
             } else {
                 System.out.println("Ocurrio un error al intentan actualizar los datos.");
@@ -422,15 +426,16 @@ public class MenuConsola {
     private void editarExtraccion() {
         System.out.println("ID de la Campaña: "); String id = leer.nextLine();
         System.out.println("RUT actual del Donante: "); String rutV = leer.nextLine();
+        String rutVFormateado = procesamiento.Validadores.formatearRut(rutV);
 
-        Extraccion e = sistema.buscarExtraccion(rutV, id);
+        Extraccion e = sistema.buscarExtraccion(rutVFormateado, id);
         if (e != null) {
             System.out.println("--- Presione Enter para mantener el valor actual ---");
 
             // Editar RUT
             System.out.println("Nuevo RUT [" + e.getVoluntario().getRut() + "]: ");
             String rutN = leer.nextLine();
-            if (rutN.isEmpty()) rutN = e.getVoluntario().getRut();
+            String rutNFormateado = rutN.isEmpty() ? e.getVoluntario().getRut() : procesamiento.Validadores.formatearRut(rutN);
 
             // Editar Fecha
             System.out.println("Nueva Fecha [" + e.getFechaExtraccion() + "]: ");
@@ -447,7 +452,7 @@ public class MenuConsola {
             String malStr = leer.nextLine();
             boolean mal = malStr.isEmpty() ? e.getSeSintioMal() : Boolean.parseBoolean(malStr);
 
-            if (sistema.actualizarExtraccion(rutV, id, rutN, fecha, vol, mal)) {
+            if (sistema.actualizarExtraccion(rutVFormateado, id, rutNFormateado, fecha, vol, mal)) {
                 System.out.println("Donacion actualizada correctamente.");
             } else {
                 System.out.println("Error al actualizar. Verifique datos.");
@@ -460,7 +465,9 @@ public class MenuConsola {
     // --- MÉTODOS DE ELIMINACIÓN ---
     private void eliminarDonante() {
         System.out.println("RUT: ");
-        if (sistema.eliminarDonante(leer.nextLine())) System.out.println("Borrado.");
+        String rut = leer.nextLine();
+        String rutFormateado = procesamiento.Validadores.formatearRut(rut);
+        if (sistema.eliminarDonante(rutFormateado)) System.out.println("Borrado.");
     }
 
     private void eliminarCampana() {
@@ -474,8 +481,9 @@ public class MenuConsola {
     private void eliminarExtraccion() {
         System.out.println("ID de la Campaña: "); String id = leer.nextLine();
         System.out.println("RUT del Donante: "); String rut = leer.nextLine();
+        String rutFormateado = procesamiento.Validadores.formatearRut(rut);
         
-        if (sistema.borrarExtraccion(id, rut)) {
+        if (sistema.borrarExtraccion(id, rutFormateado)) {
             System.out.println("Donacion eliminada");
         } else {
             System.out.println("No se encontro la donacion..");
@@ -559,8 +567,9 @@ public class MenuConsola {
         System.out.println("Ingrese el RUT del donante: ");
         System.out.flush();
         String rut = leer.nextLine();
+        String rutFormateado = procesamiento.Validadores.formatearRut(rut);
 
-        if (sistema.buscarDonante(rut) == null) {
+        if (sistema.buscarDonante(rutFormateado) == null) {
             System.out.println("El RUT " + rut + " no esta registrado.");
             return;
         }
@@ -575,7 +584,7 @@ public class MenuConsola {
 
             switch (subOp) {
                 case 1:
-                    List<InfoDonacion> historialCompleto = sistema.buscarExtraccion(rut);
+                    List<InfoDonacion> historialCompleto = sistema.buscarExtraccion(rutFormateado);
                     if (historialCompleto.isEmpty()) {
                         System.out.println("El donante no registra extracciones aun.");
                     } else {
@@ -591,7 +600,7 @@ public class MenuConsola {
                 case 2:
                     System.out.println("Ingrese el ID de la Campaña: ");
                     String idC = leer.nextLine();
-                    Extraccion e = sistema.buscarExtraccion(rut, idC);
+                    Extraccion e = sistema.buscarExtraccion(rutFormateado, idC);
                     
                     if (e != null) {
                         System.out.println("\n=== DETALLE DE DONACION EN " + idC + " ===");
@@ -642,6 +651,4 @@ public class MenuConsola {
             System.out.println("Error al exportar el archivo.");
         }
     }
-    
-    
 }

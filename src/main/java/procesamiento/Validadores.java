@@ -17,12 +17,10 @@ public interface Validadores {
     static boolean esRutValido(String rut) {
         if (rut == null || rut.trim().isEmpty()) return false;
 
-        // CORRECCIÓN: Ahora borra puntos, guiones O espacios en cualquier lugar
         String rutLimpio = rut.replaceAll("[\\-\\.\\s]", "").trim().toUpperCase();
 
         if (rutLimpio.length() < LONGITUD_RUT_MINIMA) return false;
 
-        // Verifica que todo sean números y termine en un número o K
         return rutLimpio.matches("^[0-9]+[0-9K]$"); 
     }
 
@@ -86,5 +84,24 @@ public interface Validadores {
         if (edad < 18 || edad > 65) {
             throw new EdadNoValidaException(edad);
         }
-    } 
+    }
+    public static String formatearRut(String rut) {
+        if (rut == null || rut.trim().isEmpty()) return rut;
+
+        String limpio = rut.replaceAll("[\\-\\.\\s]", "").trim().toUpperCase();
+
+        if (limpio.length() < 2) return limpio;
+
+        String cuerpo = limpio.substring(0, limpio.length() - 1);
+        String dv = limpio.substring(limpio.length() - 1);
+
+        try {
+            long numCuerpo = Long.parseLong(cuerpo);
+            java.text.NumberFormat nf = java.text.NumberFormat.getInstance(new java.util.Locale("es", "CL"));
+
+            return nf.format(numCuerpo) + "-" + dv;
+        } catch (NumberFormatException e) {
+            return limpio;
+        }
+    }
 }

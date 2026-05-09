@@ -208,6 +208,7 @@ public class VentanaPrincipal extends JFrame {
             try {
                 String nom = JOptionPane.showInputDialog("Nombre:");
                 if (nom == null || nom.trim().isEmpty()) return;
+                
                 String rut = JOptionPane.showInputDialog("RUT:");
                 if (rut == null || rut.trim().isEmpty()) return;
                 
@@ -285,9 +286,10 @@ public class VentanaPrincipal extends JFrame {
 
             String rutD = JOptionPane.showInputDialog(this, "RUT Donante:");
             if (rutD == null || rutD.trim().isEmpty()) return;
+            String rutFormateado = procesamiento.Validadores.formatearRut(rutD);
 
             entidades.Campaña c = sistema.buscarCampaña(idC);
-            entidades.Donante d = sistema.buscarDonante(rutD);
+            entidades.Donante d = sistema.buscarDonante(rutFormateado);
 
             if (c != null && d != null) {
                 try {
@@ -349,8 +351,9 @@ public class VentanaPrincipal extends JFrame {
             String rut = JOptionPane.showInputDialog(this, "Ingrese RUT a buscar:", "Buscar Donante", JOptionPane.QUESTION_MESSAGE);
 
             if (rut == null || rut.trim().isEmpty()) return;
+            String rutFormateado = procesamiento.Validadores.formatearRut(rut);
 
-            entidades.Donante d = sistema.buscarDonante(rut.trim());
+            entidades.Donante d = sistema.buscarDonante(rutFormateado);
 
             if (d != null) {
                 String mensaje = "Datos del Donante:\n"
@@ -392,8 +395,9 @@ public class VentanaPrincipal extends JFrame {
             String rut = JOptionPane.showInputDialog(this, "Ingrese RUT del donante:", "Historial de Donaciones", JOptionPane.QUESTION_MESSAGE);
 
             if (rut == null || rut.trim().isEmpty()) return;
-
-            if (sistema.buscarDonante(rut.trim()) == null) {
+            String rutF = procesamiento.Validadores.formatearRut(rut);
+            
+            if (sistema.buscarDonante(rutF.trim()) == null) {
                 JOptionPane.showMessageDialog(this, "Error: El RUT ingresado no está registrado en el sistema.", "No encontrado", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -413,7 +417,7 @@ public class VentanaPrincipal extends JFrame {
             if (op == -1) return; 
 
             if (op == 0) {
-                java.util.List<entidades.InfoDonacion> lista = sistema.buscarExtraccion(rut.trim());
+                java.util.List<entidades.InfoDonacion> lista = sistema.buscarExtraccion(rutF.trim());
 
                 if (lista.isEmpty()) {
                     JOptionPane.showMessageDialog(this, "El donante registrado aún no tiene donaciones en su historial.", "Sin historial", JOptionPane.INFORMATION_MESSAGE);
@@ -434,7 +438,7 @@ public class VentanaPrincipal extends JFrame {
 
                 if (id == null || id.trim().isEmpty()) return;
 
-                entidades.Extraccion ex = sistema.buscarExtraccion(rut.trim(), id.trim());
+                entidades.Extraccion ex = sistema.buscarExtraccion(rutF.trim(), id.trim());
 
                 if (ex != null) {
                     String fechaStr = ex.getFechaExtraccion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
@@ -455,10 +459,11 @@ public class VentanaPrincipal extends JFrame {
         // EDICIONES
         btnEdiDonante.addActionListener(e -> {
             String rut = JOptionPane.showInputDialog(this, "RUT del donante a editar:", "Editar Donante", JOptionPane.QUESTION_MESSAGE);
-
+             
             if (rut == null || rut.trim().isEmpty()) return;
-
-            entidades.Donante d = sistema.buscarDonante(rut.trim());
+            String rutF = procesamiento.Validadores.formatearRut(rut);
+            
+            entidades.Donante d = sistema.buscarDonante(rutF.trim());
 
             if (d != null) {
                 try {
@@ -468,7 +473,7 @@ public class VentanaPrincipal extends JFrame {
                     String nTel = JOptionPane.showInputDialog(this, "Nuevo Teléfono:", d.getTelefono());
                     if (nTel == null) return;
 
-                    sistema.actualizarDonante(rut.trim(), nNom.trim(), d.getEdad(), d.getSexo(), d.getTipoSangre(), nTel.trim());
+                    sistema.actualizarDonante(rutF.trim(), nNom.trim(), d.getEdad(), d.getSexo(), d.getTipoSangre(), nTel.trim());
                     JOptionPane.showMessageDialog(this, "Datos del donante actualizados exitosamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
 
                 } catch (Exception ex) {
@@ -511,17 +516,19 @@ public class VentanaPrincipal extends JFrame {
         btnEdiExtraccion.addActionListener(e -> {
             String id = JOptionPane.showInputDialog(this, "ID Campaña:", "Editar Extracción", JOptionPane.QUESTION_MESSAGE);
             if (id == null || id.trim().isEmpty()) return;
-
+            
             String rut = JOptionPane.showInputDialog(this, "RUT Donante:", "Editar Extracción", JOptionPane.QUESTION_MESSAGE);
             if (rut == null || rut.trim().isEmpty()) return;
-
-            entidades.Extraccion ex = sistema.buscarExtraccion(rut.trim(), id.trim());
+            String rutFormateado = procesamiento.Validadores.formatearRut(rut);
+            
+            entidades.Extraccion ex = sistema.buscarExtraccion(rutFormateado.trim(), id.trim());
 
             if (ex != null) {
                 try {
                     String rutN = JOptionPane.showInputDialog(this, "Nuevo RUT:", ex.getVoluntario().getRut());
                     if (rutN == null) return;
                     if (rutN.trim().isEmpty()) rutN = ex.getVoluntario().getRut();
+                    String rutNFormateado = procesamiento.Validadores.formatearRut(rutN);
 
                     String fechaActual = ex.getFechaExtraccion().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy"));
                     String fecha = JOptionPane.showInputDialog(this, "Nueva Fecha (DD/MM/AAAA):", fechaActual);
@@ -536,7 +543,7 @@ public class VentanaPrincipal extends JFrame {
                     if (malOp == JOptionPane.CANCEL_OPTION || malOp == JOptionPane.CLOSED_OPTION) return; // Si cancela o cierra en la X
                     boolean mal = (malOp == JOptionPane.YES_OPTION);
 
-                    if (sistema.actualizarExtraccion(rut.trim(), id.trim(), rutN.trim(), fecha.trim(), vol, mal)) {
+                    if (sistema.actualizarExtraccion(rutFormateado.trim(), id.trim(), rutNFormateado.trim(), fecha.trim(), vol, mal)) {
                         JOptionPane.showMessageDialog(this, "Extracción actualizada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                     } else {
                         JOptionPane.showMessageDialog(this, "Error al actualizar. Revise los datos o verifique que el nuevo RUT exista.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -557,7 +564,8 @@ public class VentanaPrincipal extends JFrame {
         btnEliDonante.addActionListener(e -> {
             String rut = JOptionPane.showInputDialog(this, "RUT del donante a eliminar:", "Eliminar Donante", JOptionPane.QUESTION_MESSAGE);
             if (rut == null || rut.trim().isEmpty()) return;
-
+            String rutFormateado = procesamiento.Validadores.formatearRut(rut);
+            
             int confirmacion = JOptionPane.showConfirmDialog(this, 
                 "¿Está seguro que desea eliminar a este donante y todo su historial de extracciones?\nEsta acción no se puede deshacer.", 
                 "Confirmar Eliminación", 
@@ -566,7 +574,7 @@ public class VentanaPrincipal extends JFrame {
 
             if (confirmacion != JOptionPane.YES_OPTION) return;
 
-            if (sistema.eliminarDonante(rut.trim())) {
+            if (sistema.eliminarDonante(rutFormateado.trim())) {
                 JOptionPane.showMessageDialog(this, "Donante e historial eliminados correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error: RUT no encontrado en el sistema.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -594,11 +602,12 @@ public class VentanaPrincipal extends JFrame {
 
         btnEliExtraccion.addActionListener(e -> {
             String id = JOptionPane.showInputDialog(this, "ID de la Campaña:", "Eliminar Extracción", JOptionPane.QUESTION_MESSAGE);
-            if (id == null || id.trim().isEmpty()) return; // Freno si cancela la campaña
+            if (id == null || id.trim().isEmpty()) return; 
 
             String rut = JOptionPane.showInputDialog(this, "RUT del Donante:", "Eliminar Extracción", JOptionPane.QUESTION_MESSAGE);
-            if (rut == null || rut.trim().isEmpty()) return; // Freno si cancela el RUT
-
+            if (rut == null || rut.trim().isEmpty()) return; 
+            String rutFormateado = procesamiento.Validadores.formatearRut(rut);
+            
             int confirmacion = JOptionPane.showConfirmDialog(this, 
                 "¿Está seguro que desea eliminar esta extracción específica?", 
                 "Confirmar Eliminación", 
@@ -607,7 +616,7 @@ public class VentanaPrincipal extends JFrame {
 
             if (confirmacion != JOptionPane.YES_OPTION) return;
 
-            if (sistema.borrarExtraccion(id.trim(), rut.trim())) {
+            if (sistema.borrarExtraccion(id.trim(), rutFormateado.trim())) {
                 JOptionPane.showMessageDialog(this, "Extracción eliminada correctamente.", "Éxito", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 JOptionPane.showMessageDialog(this, "Error: No se encontró la extracción especificada.", "Error", JOptionPane.ERROR_MESSAGE);

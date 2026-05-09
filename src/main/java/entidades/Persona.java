@@ -8,7 +8,7 @@ public abstract class Persona implements procesamiento.Validadores {
     
     public Persona(String nombre, String rut, int edad, String sexo) {
         this.nombre = nombre;
-        this.rut = rut;
+        this.rut = procesamiento.Validadores.formatearRut(rut);
         this.edad = edad;
         this.sexo = sexo;
     }
